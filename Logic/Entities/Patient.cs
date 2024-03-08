@@ -28,7 +28,7 @@ namespace Logic.Entities
         public Guid Id { get; set; }
         public HumanName Name { get; set; }
         public Gender? Gender { get; set; }
-        public DateTime BirthDate { get; private set; }
+        public DateTime BirthDate { get; set; }
         public bool? Active { get; set; }
         #endregion
     }

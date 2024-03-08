@@ -23,20 +23,11 @@ namespace Logic.Patients
             #region Constructor
             private Deleting()
             {
-                this.id = string.Empty;
             }
-            #endregion
-
-            #region Fields
-            private string id;
             #endregion
 
             #region Properties
-            public string Id
-            {
-                get { return this.id; }
-                set { this.id = value; }
-            }
+            public Guid? Id { get; set; }
             #endregion
 
             #region Methods
@@ -63,10 +54,7 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (string.IsNullOrWhiteSpace(this.id) == true)
-                    return false;
-
-                if (Guid.TryParse(this.id, out _) == false)
+                if (this.Id == null)
                     return false;
 
                 return true;
@@ -76,7 +64,7 @@ namespace Logic.Patients
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
-                    Patient patient = await context.Patients.SingleAsync(item => item.Id == Guid.Parse(this.Id));
+                    Patient patient = await context.Patients.SingleAsync(item => item.Id == this.Id);
                     if (patient == null)
                         return new NotFoundResult();
 

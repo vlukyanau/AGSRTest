@@ -27,7 +27,7 @@ namespace Logic.Entities
         #region Properties
         public Guid Id { get; private set; }
         public string Use { get; set; }
-        public string Family { get; private set; }
+        public string Family { get; set; }
         public List<string> Given { get; set; }
         #endregion
     }

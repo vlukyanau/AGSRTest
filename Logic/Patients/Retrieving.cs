@@ -39,7 +39,7 @@ namespace Logic.Patients
                     //return new BadRequestResult();
                 }
             }
-            public async Task<IPatient> Go(string id)
+            public async Task<IPatient> Go(Guid id)
             {
                 try
                 {
@@ -67,14 +67,11 @@ namespace Logic.Patients
                     return patients;
                 }
             }
-            private async Task<IPatient> Process(string id)
+            private async Task<IPatient> Process(Guid id)
             {
-                if (Guid.TryParse(id, out Guid guid) == false)
-                    return null;
-
                 using (ApplicationContext context = new ApplicationContext())
                 {
-                    Patient patient = await context.Patients.Include(patient => patient.Name).SingleAsync(item => item.Id == Guid.Parse(id));
+                    Patient patient = await context.Patients.Include(patient => patient.Name).SingleAsync(item => item.Id == id);
 
                     return patient;
                 }

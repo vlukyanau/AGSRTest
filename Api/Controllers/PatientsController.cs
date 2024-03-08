@@ -1,14 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Api.Results;
-
 using Microsoft.AspNetCore.Mvc;
 
-using Logic.Entities;
+using Api.Results;
+
 using Logic.Patients;
-using System.Net;
-using System;
+using Api.Models;
 
 
 namespace Api.Controllers
@@ -22,17 +21,17 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            IReadOnlyList<IPatient> result = await retrieving.Go();
+            var result = await retrieving.Go();
 
             return new OutputResult(result);
         }
 
         [HttpGet("api/accounts/{id}")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> Get(Guid id)
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            IPatient result = await retrieving.Go(id);
+            var result = await retrieving.Go(id);
 
             return new OutputResult(result);
         }
@@ -46,9 +45,15 @@ namespace Api.Controllers
         }
 
         [HttpPost("api/accounts/")]
-        public async Task<IActionResult> Post()
+        public async Task<IActionResult> Post([FromBody] Patient patient)
         {
             Patients.Creation creation = Patients.Creation.New();
+            creation.Use = patient.Name.Use;
+            creation.Family = patient.Name.Family;
+            creation.Given = patient.Name.Given;
+            creation.Gender = patient.Gender;
+            creation.BirthDate = patient.BirthDate;
+            creation.Active = patient.Active;
 
             StatusCodeResult result = await creation.Go();
 
@@ -56,9 +61,16 @@ namespace Api.Controllers
         }
 
         [HttpPut("api/accounts/")]
-        public async Task<IActionResult> Put()
+        public async Task<IActionResult> Put([FromBody] Patient patient)
         {
             Patients.Updating updating = Patients.Updating.New();
+            updating.Id = patient.Id;
+            updating.Use = patient.Name.Use;
+            updating.Family = patient.Name.Family;
+            updating.Given = patient.Name.Given;
+            updating.Gender = patient.Gender;
+            updating.BirthDate = patient.BirthDate;
+            updating.Active = patient.Active;
 
             StatusCodeResult result = await updating.Go();
 
@@ -66,7 +78,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("api/accounts/{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             Patients.Deleting deleting = Patients.Deleting.New();
             deleting.Id = id;

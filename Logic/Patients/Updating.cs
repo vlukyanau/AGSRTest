@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,13 @@ namespace Logic.Patients
             #endregion
 
             #region Properties
-            public string Id { get; set; }
+            public Guid? Id { get; set; }
+            public string Use { get; set; }
+            public string Family { get; set; }
+            public List<string> Given { get; set; }
             public Gender? Gender { get; set; }
+            public DateTime? BirthDate { get; set; }
+            public bool? Active { get; set; }
             #endregion
 
             #region Methods
@@ -49,7 +55,13 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (Guid.TryParse(this.Id, out _) == false)
+                if (this.Id == null)
+                    return false;
+
+                if (this.Family == null)
+                    return false;
+
+                if (this.BirthDate == null)
                     return false;
 
                 return true;
@@ -59,12 +71,16 @@ namespace Logic.Patients
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
-                    Patient patient = await context.Patients.SingleAsync(item => item.Id == Guid.Parse(this.Id));
+                    Patient patient = await context.Patients.Include(item => item.Name).SingleAsync(item => item.Id == this.Id);
                     if (patient == null)
                         return new NotFoundResult();
 
-                    if (this.Gender != null)
-                        patient.Gender = this.Gender;
+                    patient.Name.Use = this.Use;
+                    patient.Name.Family = this.Family;
+                    patient.Name.Given = this.Given;
+                    patient.Gender = this.Gender;
+                    patient.BirthDate = (DateTime)this.BirthDate;
+                    patient.Active = this.Active;
 
                     context.Update(patient);
 

@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace Api.Results
 {
-     public class OutputResult : JsonResult
+    public class OutputResult : JsonResult
     {
         #region Static
         private static JsonSerializerOptions GetSettings()
@@ -14,6 +14,7 @@ namespace Api.Results
             JsonSerializerOptions settings = new JsonSerializerOptions();
             settings.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             settings.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            settings.Converters.Add(new JsonStringEnumConverter());
 
             return settings;
         }
