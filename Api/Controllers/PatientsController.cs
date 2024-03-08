@@ -13,10 +13,10 @@ using Api.Models;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class PatientsController : ControllerBase
     {
-        [HttpGet("api/accounts/")]
+        [HttpGet]
         public async Task<IActionResult> Get()
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
@@ -26,7 +26,7 @@ namespace Api.Controllers
             return new OutputResult(result);
         }
 
-        [HttpGet("api/accounts/{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> Get(Guid id)
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
@@ -36,15 +36,15 @@ namespace Api.Controllers
             return new OutputResult(result);
         }
 
-        [HttpGet("api/accounts/{search}")]
-        public async Task<IActionResult> Search(DateTime date)
+        [HttpGet("birthDate")]
+        public async Task<IActionResult> Search([FromQuery]DateTime[] date)
         {
             await Task.CompletedTask;
 
             return new OkResult();
         }
 
-        [HttpPost("api/accounts/")]
+        [HttpPost]
         public async Task<IActionResult> Post([FromBody] Patient patient)
         {
             Patients.Creation creation = Patients.Creation.New();
@@ -60,7 +60,7 @@ namespace Api.Controllers
             return result;
         }
 
-        [HttpPut("api/accounts/")]
+        [HttpPut]
         public async Task<IActionResult> Put([FromBody] Patient patient)
         {
             Patients.Updating updating = Patients.Updating.New();
@@ -77,7 +77,7 @@ namespace Api.Controllers
             return result;
         }
 
-        [HttpDelete("api/accounts/{id}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             Patients.Deleting deleting = Patients.Deleting.New();
