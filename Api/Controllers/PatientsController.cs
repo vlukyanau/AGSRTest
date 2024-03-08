@@ -1,5 +1,6 @@
-using System;
 using System.Threading.Tasks;
+
+using Api.Results;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +21,7 @@ namespace Api.Controllers
 
             var result = await retrieving.Go();
 
-            return new JsonResult(result);
+            return new OutputResult(result);
         }
 
         [HttpGet("api/accounts/{id}")]
@@ -28,9 +29,9 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            var result = await retrieving.Go(id);
+            IPatient result = await retrieving.Go(id);
 
-            return new JsonResult(result);
+            return new OutputResult(result);
         }
 
         [HttpPost("api/accounts/")]
@@ -38,9 +39,9 @@ namespace Api.Controllers
         {
             Patients.Creation creation = Patients.Creation.New();
 
-            var result = await creation.Go();
+            StatusCodeResult result = await creation.Go();
 
-            return new JsonResult(result);
+            return new OutputResult(result);
         }
 
         [HttpPut("api/accounts/")]

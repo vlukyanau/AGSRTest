@@ -7,10 +7,11 @@ namespace Logic.Entities
     public sealed class Name : IName
     {
         #region Static
-        public static Name New()
+        public static Name New(string family)
         {
             Name name = new Name();
             name.Id = Guid.NewGuid();
+            name.Family = family;
 
             return name;
         }
@@ -19,9 +20,6 @@ namespace Logic.Entities
         #region Constructors
         private Name()
         {
-            this.Use = string.Empty;
-            this.Family = string.Empty;
-            this.Given = new List<string>();
         }
         #endregion
 

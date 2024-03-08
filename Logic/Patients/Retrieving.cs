@@ -45,17 +45,17 @@ namespace Logic.Patients
                     //return new BadRequestResult();
                 }
             }
-            public async Task<IReadOnlyList<IPatient>> Go(string id)
+            public async Task<IPatient> Go(string id)
             {
                 try
                 {
                     if (this.Verify() == false)
-                        return new List<IPatient>();
+                        return Patient.New("Test", DateTime.Now);
                     //return new BadRequestResult();
 
                     using (TransactionScope transaction = new TransactionScope())
                     {
-                        IReadOnlyList<IPatient> result = await this.Process(id);
+                        IPatient result = await this.Process(id);
 
                         transaction.Complete();
 
@@ -66,7 +66,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return new List<IPatient>();
+                    return Patient.New("Test", DateTime.Now);
                     //return new BadRequestResult();
                 }
             }
@@ -84,11 +84,11 @@ namespace Logic.Patients
 
                 return new List<IPatient>();
             }
-            private async Task<IReadOnlyList<IPatient>> Process(string id)
+            private async Task<IPatient> Process(string id)
             {
                 await Task.CompletedTask;
 
-                return new List<IPatient>();
+                return Patient.New("Test", DateTime.Now);
             }
             #endregion
         }
