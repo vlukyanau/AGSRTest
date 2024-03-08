@@ -4,21 +4,22 @@ using System.Collections.Generic;
 
 namespace Logic.Entities
 {
-    public sealed class Name : IName
+    public sealed class HumanName : IHumanName
     {
         #region Static
-        public static Name New(string family)
+        public static HumanName New(string family)
         {
-            Name name = new Name();
+            HumanName name = new HumanName();
             name.Id = Guid.NewGuid();
             name.Family = family;
+            name.Given = new List<string>();
 
             return name;
         }
         #endregion
 
         #region Constructors
-        private Name()
+        private HumanName()
         {
         }
         #endregion
@@ -26,8 +27,8 @@ namespace Logic.Entities
         #region Properties
         public Guid Id { get; private set; }
         public string Use { get; set; }
-        public string Family { get; set; }
-        public IList<string> Given { get; set; }
+        public string Family { get; private set; }
+        public List<string> Given { get; set; }
         #endregion
     }
 }

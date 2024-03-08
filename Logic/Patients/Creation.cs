@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
-
+using Logic.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -26,14 +27,9 @@ namespace Logic.Patients
                     if (this.Verify() == false)
                         return new BadRequestResult();
 
-                    using (TransactionScope transaction = new TransactionScope())
-                    {
-                        StatusCodeResult result = await this.Process();
+                    StatusCodeResult result = await this.Process();
 
-                        transaction.Complete();
-
-                        return result;
-                    }
+                    return result;
                 }
                 catch (Exception exception)
                 {
@@ -52,7 +48,19 @@ namespace Logic.Patients
 
             private async Task<StatusCodeResult> Process()
             {
-                await Task.CompletedTask;
+                using (ApplicationContext context = new ApplicationContext())
+                {
+                    Patient patient = Patient.New("Test", DateTime.UtcNow);
+                    patient.Name.Use = "official";
+                    patient.Name.Given.Add("Иван");
+                    patient.Name.Given.Add("Иванович");
+                    patient.Gender = Gender.Male;
+                    patient.Active = true;
+
+                    await context.AddAsync(patient);
+
+                    await context.SaveChangesAsync();
+                }
 
                 return new OkResult();
             }

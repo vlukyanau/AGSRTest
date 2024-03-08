@@ -5,7 +5,8 @@ namespace Logic.Entities
 {
     public interface IPatient
     {
-        public Name Name { get; }
+        public Guid Id { get; }
+        public HumanName Name { get; }
         public Gender? Gender { get; }
         public DateTime BirthDate { get; }
         public bool? Active { get; }

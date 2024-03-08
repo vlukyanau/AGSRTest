@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Logic.Entities
@@ -6,10 +7,11 @@ namespace Logic.Entities
     public sealed class Patient : IPatient
     {
         #region Static
-        public static Patient New(string name, DateTime birthDate)
+        public static Patient New(string family, DateTime birthDate)
         {
             Patient patient = new Patient();
-            patient.Name = Name.New(name);
+            patient.Id = Guid.NewGuid();
+            patient.Name = HumanName.New(family);
             patient.BirthDate = birthDate;
 
             return patient;
@@ -23,9 +25,10 @@ namespace Logic.Entities
         #endregion
 
         #region Properties
-        public Name Name { get; set; }
+        public Guid Id { get; set; }
+        public HumanName Name { get; set; }
         public Gender? Gender { get; set; }
-        public DateTime BirthDate { get; set; }
+        public DateTime BirthDate { get; private set; }
         public bool? Active { get; set; }
         #endregion
     }

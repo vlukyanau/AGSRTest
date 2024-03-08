@@ -13,6 +13,7 @@ namespace Api.Results
         {
             JsonSerializerOptions settings = new JsonSerializerOptions();
             settings.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            settings.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
             return settings;
         }

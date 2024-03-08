@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Logic.Entities
 {
-    public interface IName
+    public interface IHumanName
     {
         public Guid Id { get; }
         public string Use { get; }
         public string Family { get; }
-        public IList<string> Given { get; }
+        public List<string> Given { get; }
     }
 }

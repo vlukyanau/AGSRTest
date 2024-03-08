@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Transactions;
+
+using Microsoft.EntityFrameworkCore;
 
 using Logic.Entities;
 
@@ -24,18 +27,9 @@ namespace Logic.Patients
             {
                 try
                 {
-                    if (this.Verify() == false)
-                        return new List<IPatient>();
-                    //return new BadRequestResult();
+                    IReadOnlyList<IPatient> result = await this.Process();
 
-                    using (TransactionScope transaction = new TransactionScope())
-                    {
-                        IReadOnlyList<IPatient> result = await this.Process();
-
-                        transaction.Complete();
-
-                        return result;
-                    }
+                    return result;
                 }
                 catch (Exception exception)
                 {
@@ -49,46 +43,41 @@ namespace Logic.Patients
             {
                 try
                 {
-                    if (this.Verify() == false)
-                        return Patient.New("Test", DateTime.Now);
-                    //return new BadRequestResult();
+                    IPatient result = await this.Process(id);
 
-                    using (TransactionScope transaction = new TransactionScope())
-                    {
-                        IPatient result = await this.Process(id);
-
-                        transaction.Complete();
-
-                        return result;
-                    }
+                    return result;
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
 
-                    return Patient.New("Test", DateTime.Now);
+                    return Patient.New("Error", DateTime.Now);
                     //return new BadRequestResult();
                 }
             }
             #endregion
 
             #region Assistants
-            private bool Verify()
-            {
-                return true;
-            }
-
             private async Task<IReadOnlyList<IPatient>> Process()
             {
-                await Task.CompletedTask;
+                using (ApplicationContext context = new ApplicationContext())
+                {
+                    IReadOnlyList<Patient> patients = await context.Patients.Include(patient => patient.Name).ToListAsync();
 
-                return new List<IPatient>();
+                    return patients;
+                }
             }
             private async Task<IPatient> Process(string id)
             {
-                await Task.CompletedTask;
+                if (Guid.TryParse(id, out Guid guid) == false)
+                    return null;
 
-                return Patient.New("Test", DateTime.Now);
+                using (ApplicationContext context = new ApplicationContext())
+                {
+                    Patient patient = await context.Patients.Include(patient => patient.Name).SingleAsync(item => item.Id == Guid.Parse(id));
+
+                    return patient;
+                }
             }
             #endregion
         }

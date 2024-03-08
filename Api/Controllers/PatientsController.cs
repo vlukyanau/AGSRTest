@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Api.Results;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 using Logic.Entities;
 using Logic.Patients;
+using System.Net;
+using System;
 
 
 namespace Api.Controllers
@@ -19,7 +22,7 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            var result = await retrieving.Go();
+            IReadOnlyList<IPatient> result = await retrieving.Go();
 
             return new OutputResult(result);
         }
@@ -34,6 +37,14 @@ namespace Api.Controllers
             return new OutputResult(result);
         }
 
+        [HttpGet("api/accounts/{search}")]
+        public async Task<IActionResult> Search(DateTime date)
+        {
+            await Task.CompletedTask;
+
+            return new OkResult();
+        }
+
         [HttpPost("api/accounts/")]
         public async Task<IActionResult> Post()
         {
@@ -41,7 +52,7 @@ namespace Api.Controllers
 
             StatusCodeResult result = await creation.Go();
 
-            return new OutputResult(result);
+            return result;
         }
 
         [HttpPut("api/accounts/")]

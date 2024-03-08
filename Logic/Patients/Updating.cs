@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Transactions;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+using Logic.Entities;
 
 
 namespace Logic.Patients
@@ -18,6 +20,11 @@ namespace Logic.Patients
             }
             #endregion
 
+            #region Properties
+            public string Id { get; set; }
+            public Gender? Gender { get; set; }
+            #endregion
+
             #region Methods
             public async Task<StatusCodeResult> Go()
             {
@@ -26,14 +33,9 @@ namespace Logic.Patients
                     if (this.Verify() == false)
                         return new BadRequestResult();
 
-                    using (TransactionScope transaction = new TransactionScope())
-                    {
-                        StatusCodeResult result = await this.Process();
+                    StatusCodeResult result = await this.Process();
 
-                        transaction.Complete();
-
-                        return result;
-                    }
+                    return result;
                 }
                 catch (Exception exception)
                 {
@@ -47,12 +49,27 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
+                if (Guid.TryParse(this.Id, out _) == false)
+                    return false;
+
                 return true;
             }
 
             private async Task<StatusCodeResult> Process()
             {
-                await Task.CompletedTask;
+                using (ApplicationContext context = new ApplicationContext())
+                {
+                    Patient patient = await context.Patients.SingleAsync(item => item.Id == Guid.Parse(this.Id));
+                    if (patient == null)
+                        return new NotFoundResult();
+
+                    if (this.Gender != null)
+                        patient.Gender = this.Gender;
+
+                    context.Update(patient);
+
+                    await context.SaveChangesAsync();
+                }
 
                 return new OkResult();
             }

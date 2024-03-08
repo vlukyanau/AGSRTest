@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using System.Transactions;
-
+using Logic.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Logic.Patients
@@ -45,14 +47,9 @@ namespace Logic.Patients
                     if (this.Verify() == false)
                         return new BadRequestResult();
 
-                    using (TransactionScope transaction = new TransactionScope())
-                    {
-                        StatusCodeResult result = await this.Process();
+                    StatusCodeResult result = await this.Process();
 
-                        transaction.Complete();
-
-                        return result;
-                    }
+                    return result;
                 }
                 catch (Exception exception)
                 {
@@ -69,12 +66,24 @@ namespace Logic.Patients
                 if (string.IsNullOrWhiteSpace(this.id) == true)
                     return false;
 
+                if (Guid.TryParse(this.id, out _) == false)
+                    return false;
+
                 return true;
             }
 
             private async Task<StatusCodeResult> Process()
             {
-                await Task.CompletedTask;
+                using (ApplicationContext context = new ApplicationContext())
+                {
+                    Patient patient = await context.Patients.SingleAsync(item => item.Id == Guid.Parse(this.Id));
+                    if (patient == null)
+                        return new NotFoundResult();
+
+                    context.Patients.Remove(patient);
+
+                    await context.SaveChangesAsync();
+                }
 
                 return new OkResult();
             }
