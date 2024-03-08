@@ -1,6 +1,10 @@
+using System;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
+
+using Logic.Entities;
+using Logic.Patients;
 
 
 namespace Api.Controllers
@@ -9,44 +13,55 @@ namespace Api.Controllers
     [Route("[controller]")]
     public class PatientsController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("api/accounts/")]
         public async Task<IActionResult> Get()
         {
-            await Task.CompletedTask;
+            Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            return this.Ok();
+            var result = await retrieving.Go();
+
+            return new JsonResult(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("api/accounts/{id}")]
         public async Task<IActionResult> Get(string id)
         {
-            await Task.CompletedTask;
+            Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            return this.Ok();
+            IPatient result = await retrieving.Go(id);
+
+            return new JsonResult(result);
         }
 
-        [HttpPost]
+        [HttpPost("api/accounts/")]
         public async Task<IActionResult> Post()
         {
-            await Task.CompletedTask;
+            Patients.Creation creation = Patients.Creation.New();
 
-            return this.Ok();
+            Guid result = await creation.Go();
+
+            return new JsonResult(result);
         }
 
-        [HttpPut]
+        [HttpPut("api/accounts/")]
         public async Task<IActionResult> Put()
         {
-            await Task.CompletedTask;
+            Patients.Updating updating = Patients.Updating.New();
 
-            return this.Ok();
+            StatusCodeResult result = await updating.Go();
+
+            return result;
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("api/accounts/{id}")]
         public async Task<IActionResult> Delete(string id)
         {
-            await Task.CompletedTask;
+            Patients.Deleting deleting = Patients.Deleting.New();
+            deleting.Id = id;
 
-            return this.Ok();
+            StatusCodeResult result = await deleting.Go();
+
+            return result;
         }
     }
 }
