@@ -1,4 +1,9 @@
-﻿using Logic.Entities;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Transactions;
+
+using Logic.Entities;
 
 
 namespace Logic.Patients
@@ -15,13 +20,75 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public Task<IReadOnlyList<IPatient>> Go()
+            public async Task<IReadOnlyList<IPatient>> Go()
             {
-                throw new NotImplementedException();
+                try
+                {
+                    if (this.Verify() == false)
+                        return new List<IPatient>();
+                    //return new BadRequestResult();
+
+                    using (TransactionScope transaction = new TransactionScope())
+                    {
+                        IReadOnlyList<IPatient> result = await this.Process();
+
+                        transaction.Complete();
+
+                        return result;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+
+                    return new List<IPatient>();
+                    //return new BadRequestResult();
+                }
             }
-            public Task<IPatient> Go(string id)
+            public async Task<IReadOnlyList<IPatient>> Go(string id)
             {
-                throw new NotImplementedException();
+                try
+                {
+                    if (this.Verify() == false)
+                        return new List<IPatient>();
+                    //return new BadRequestResult();
+
+                    using (TransactionScope transaction = new TransactionScope())
+                    {
+                        IReadOnlyList<IPatient> result = await this.Process(id);
+
+                        transaction.Complete();
+
+                        return result;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+
+                    return new List<IPatient>();
+                    //return new BadRequestResult();
+                }
+            }
+            #endregion
+
+            #region Assistants
+            private bool Verify()
+            {
+                return true;
+            }
+
+            private async Task<IReadOnlyList<IPatient>> Process()
+            {
+                await Task.CompletedTask;
+
+                return new List<IPatient>();
+            }
+            private async Task<IReadOnlyList<IPatient>> Process(string id)
+            {
+                await Task.CompletedTask;
+
+                return new List<IPatient>();
             }
             #endregion
         }

@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Threading.Tasks;
+using System.Transactions;
+
+using Microsoft.AspNetCore.Mvc;
 
 
 namespace Logic.Patients
@@ -11,6 +15,13 @@ namespace Logic.Patients
             public static Deleting New()
             {
                 return new Deleting();
+            }
+            #endregion
+
+            #region Constructor
+            private Deleting()
+            {
+                this.id = string.Empty;
             }
             #endregion
 
@@ -31,9 +42,17 @@ namespace Logic.Patients
             {
                 try
                 {
-                    await Task.CompletedTask;
+                    if (this.Verify() == false)
+                        return new BadRequestResult();
 
-                    return new OkResult();
+                    using (TransactionScope transaction = new TransactionScope())
+                    {
+                        StatusCodeResult result = await this.Process();
+
+                        transaction.Complete();
+
+                        return result;
+                    }
                 }
                 catch (Exception exception)
                 {
@@ -47,10 +66,17 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (this.id == null)
+                if (string.IsNullOrWhiteSpace(this.id) == true)
                     return false;
 
                 return true;
+            }
+
+            private async Task<StatusCodeResult> Process()
+            {
+                await Task.CompletedTask;
+
+                return new OkResult();
             }
             #endregion
         }

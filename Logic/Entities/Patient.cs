@@ -1,12 +1,14 @@
-﻿namespace Logic.Entities
+﻿using System;
+
+
+namespace Logic.Entities
 {
-    public class Patient : IPatient
+    public sealed class Patient : IPatient
     {
         #region Static
         public static Patient New()
         {
             Patient patient = new Patient();
-            patient.Id = Guid.NewGuid();
 
             return patient;
         }
@@ -15,18 +17,15 @@
         #region Constructors
         private Patient()
         {
+            this.Name = Name.New();
         }
         #endregion
 
         #region Properties
-        public Guid Id { get; private set; }
-        #endregion
-
-        #region IPatient
-        Guid IPatient.Id
-        {
-            get { return this.Id; }
-        }
+        public Name Name { get; set; }
+        public Gender Gender { get; set; }
+        public DateTime BirthDate { get; set; }
+        public bool Active { get; set; }
         #endregion
     }
 }

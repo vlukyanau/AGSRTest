@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -11,5 +10,9 @@
       <HintPath>..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\6.0.27\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
+
+  <PropertyGroup>
+    <NoWarn>IDE0063;IDE0090;CA1822</NoWarn>
+  </PropertyGroup>
 
 </Project>

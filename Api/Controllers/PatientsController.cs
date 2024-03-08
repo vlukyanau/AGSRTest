@@ -28,7 +28,7 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            IPatient result = await retrieving.Go(id);
+            var result = await retrieving.Go(id);
 
             return new JsonResult(result);
         }
@@ -38,7 +38,7 @@ namespace Api.Controllers
         {
             Patients.Creation creation = Patients.Creation.New();
 
-            Guid result = await creation.Go();
+            var result = await creation.Go();
 
             return new JsonResult(result);
         }
