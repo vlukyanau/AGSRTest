@@ -35,7 +35,7 @@ namespace Logic.Patients
                 try
                 {
                     if (this.Verify() == false)
-                        return Result.Fail;
+                        return Result.BadRequest;
 
                     IResult result = await this.Process();
 
@@ -45,7 +45,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.Fail;
+                    return Result.BadRequest;
                 }
             }
             #endregion

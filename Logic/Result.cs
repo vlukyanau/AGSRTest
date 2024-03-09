@@ -23,6 +23,10 @@ namespace Logic
         {
             return result.Code;
         }
+        public static implicit operator int(Result result)
+        {
+            return (int)result.Code;
+        }
         #endregion
 
         #region Static
@@ -54,7 +58,7 @@ namespace Logic
         public static readonly Result Ok = HttpStatusCode.OK;
         public static readonly Result Created = HttpStatusCode.Created;
         public static readonly Result NoContent = HttpStatusCode.NoContent;
-        public static readonly Result Fail = HttpStatusCode.BadRequest;
+        public static readonly Result BadRequest = HttpStatusCode.BadRequest;
         public static readonly Result NotFound = HttpStatusCode.NotFound;
         #endregion
 

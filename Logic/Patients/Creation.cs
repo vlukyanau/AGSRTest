@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Logic.Entities;
@@ -33,7 +34,7 @@ namespace Logic.Patients
                 try
                 {
                     if (this.Verify() == false)
-                        return Result.Fail;
+                        return Result.BadRequest;
 
                     IResult result = await this.Process();
 
@@ -44,7 +45,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.Fail;
+                    return Result.BadRequest;
                 }
             }
             #endregion
@@ -52,7 +53,19 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (this.Family == null)
+                if (string.IsNullOrWhiteSpace(this.Use) == true)
+                    return false;
+
+                if (string.IsNullOrWhiteSpace(this.Family) == true)
+                    return false;
+
+                if (this.Given.Count == 0)
+                    return false;
+
+                if (this.Given.Any(string.IsNullOrWhiteSpace) == true)
+                    return false;
+
+                if (this.Gender != null && Enum.IsDefined(typeof(Gender), this.Gender) == false)
                     return false;
 
                 if (this.BirthDate == null)

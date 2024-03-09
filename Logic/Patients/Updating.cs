@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -36,7 +37,7 @@ namespace Logic.Patients
                 try
                 {
                     if (this.Verify() == false)
-                        return Result.Fail;
+                        return Result.BadRequest;
 
                     IResult result = await this.Process();
 
@@ -46,7 +47,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.Fail;
+                    return Result.BadRequest;
                 }
             }
             #endregion
@@ -57,7 +58,19 @@ namespace Logic.Patients
                 if (this.Id == null)
                     return false;
 
-                if (this.Family == null)
+                if (string.IsNullOrWhiteSpace(this.Use) == true)
+                    return false;
+
+                if (string.IsNullOrWhiteSpace(this.Family) == true)
+                    return false;
+
+                if (this.Given.Count == 0)
+                    return false;
+
+                if (this.Given.Any(string.IsNullOrWhiteSpace) == true)
+                    return false;
+
+                if (this.Gender != null && Enum.IsDefined(typeof(Gender), this.Gender) == false)
                     return false;
 
                 if (this.BirthDate == null)
@@ -72,7 +85,7 @@ namespace Logic.Patients
                 {
                     Patient patient = await context.Patients.Include(item => item.Name).SingleAsync(item => item.Id == this.Id);
                     if (patient == null)
-                        return Result.Fail;
+                        return Result.BadRequest;
 
                     patient.Name.Use = this.Use;
                     patient.Name.Family = this.Family;
@@ -86,7 +99,7 @@ namespace Logic.Patients
                     await context.SaveChangesAsync();
                 }
 
-                return Result.Ok;
+                return Result.NoContent;
             }
             #endregion
         }

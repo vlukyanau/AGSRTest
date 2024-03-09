@@ -33,7 +33,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.Fail;
+                    return Result.BadRequest;
                 }
             }
             public async Task<IResult> Go(Guid id)
@@ -48,7 +48,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.Fail;
+                    return Result.BadRequest;
                 }
             }
             #endregion

@@ -1,6 +1,12 @@
+using System;
+using System.IO;
+using System.Reflection;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using Api.Swagger;
 
 
 namespace Api
@@ -16,7 +22,14 @@ namespace Api
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                string name = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                string patch = Path.Combine(AppContext.BaseDirectory, name);
+                options.IncludeXmlComments(patch);
+
+                options.SchemaFilter<EnumSchemaFilter>();
+            });
 
             WebApplication app = builder.Build();
 
