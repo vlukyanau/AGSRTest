@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logic", "Logic\Logic.csproj", "{09DB2EDC-DA47-484E-AC83-33F4ECA820E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatePatients", "CreatePatients\CreatePatients.csproj", "{12B05409-DF23-4329-A589-A0460E01986A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CreatePatients", "CreatePatients\CreatePatients.csproj", "{12B05409-DF23-4329-A589-A0460E01986A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postman", "Postman", "{D13D6E70-846A-4C16-A6E1-CDD52A586207}"
+	ProjectSection(SolutionItems) = preProject
+		Postman\TestPatientApi.postman_collection.json = Postman\TestPatientApi.postman_collection.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

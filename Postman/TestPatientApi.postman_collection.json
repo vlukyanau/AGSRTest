@@ -1,0 +1,162 @@
+{
+	"info": {
+		"_postman_id": "3d0fc70e-c910-4f79-a3ff-ba72af3b72d8",
+		"name": "TestPatientApi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Patient",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json()\r",
+							"pm.collectionVariables.set(\"id\", jsonData.id)"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"name\": {\r\n     \"use\": \"official\",\r\n     \"family\": \"Иванов\",\r\n     \"given\": [\r\n       \"Иван\",\r\n       \"Иванович\"\r\n     ]\r\n   },\r\n   \"gender\": 1,\r\n   \"birthDate\": \"2024-03-09T20:35:14.335Z\",\r\n   \"active\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{patch}}/patients",
+					"host": [
+						"{{patch}}"
+					],
+					"path": [
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Patient",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"{{id}}\",\r\n    \"name\": {\r\n        \"id\": \"1f82f4fe-794d-4289-8059-4c7f8493e3c6\",\r\n        \"use\": \"official\",\r\n        \"family\": \"Иванов2\",\r\n        \"given\": [\r\n            \"Иван2\",\r\n            \"Иванович2\"\r\n        ]\r\n    },\r\n    \"gender\": 1,\r\n    \"birthDate\": \"2024-03-09T20:35:14.335Z\",\r\n    \"active\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{patch}}/patients",
+					"host": [
+						"{{patch}}"
+					],
+					"path": [
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get by Id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{patch}}/patients/{{id}}",
+					"host": [
+						"{{patch}}"
+					],
+					"path": [
+						"patients",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Patient",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{patch}}/patients/{{id}}",
+					"host": [
+						"{{patch}}"
+					],
+					"path": [
+						"patients",
+						"{{id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": null
+		},
+		{
+			"key": "patch",
+			"value": "https://localhost:7141/api",
+			"type": "default"
+		}
+	]
+}
