@@ -26,7 +26,7 @@ namespace Logic.Patients
             #endregion
 
             #region Properties
-            public Guid? Id { get; set; }
+            public Guid Id { get; set; }
             #endregion
 
             #region Methods
@@ -34,9 +34,6 @@ namespace Logic.Patients
             {
                 try
                 {
-                    if (this.Verify() == false)
-                        return Result.BadRequest;
-
                     IResult result = await this.Process();
 
                     return result;
@@ -51,14 +48,6 @@ namespace Logic.Patients
             #endregion
 
             #region Assistants
-            private bool Verify()
-            {
-                if (this.Id == null)
-                    return false;
-
-                return true;
-            }
-
             private async Task<IResult> Process()
             {
                 using (ApplicationContext context = new ApplicationContext())

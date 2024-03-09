@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.IO;
+using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +29,26 @@ namespace Api.Results
             : base(result.Data, OutputResult.GetSettings())
         {
             this.StatusCode = (int)result.Code;
+        }
+        #endregion
+
+        #region Overriding
+        public override Task ExecuteResultAsync(ActionContext context)
+        {
+            if (this.StatusCode == 204)
+                context.HttpContext.Response.Body = Stream.Null;
+
+            return base.ExecuteResultAsync(context);
+        }
+
+        public override void ExecuteResult(ActionContext context)
+        {
+            if (this.StatusCode == 204)
+                context.HttpContext.Response.Body = Stream.Null;
+
+            context.HttpContext.Response.StatusCode = (int)this.StatusCode;
+
+            base.ExecuteResult(context);
         }
         #endregion
     }

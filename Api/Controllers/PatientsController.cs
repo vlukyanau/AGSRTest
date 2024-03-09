@@ -94,6 +94,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Post([FromBody] Patient patient)
         {
             Patients.Creation creation = Patients.Creation.New();
+            creation.Id = patient.Id;
             creation.Use = patient.Name.Use;
             creation.Family = patient.Name.Family;
             creation.Given = patient.Name.Given;
@@ -157,28 +158,7 @@ namespace Api.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        /// <remarks>
-        /// Sample request:
-        /// 
-        ///     {
-        ///        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        ///        "name": {
-        ///          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        ///          "use": "official",
-        ///          "family": "Иванов",
-        ///          "given": [
-        ///            "Иван",
-        ///            "Иванович"
-        ///          ]
-        ///        },
-        ///        "gender": 1,
-        ///        "birthDate": "2024-03-09T17:59:51",
-        ///        "active": true
-        ///     }
-        ///
-        /// </remarks>
         /// <response code="204">'Patient' has been deleted</response>
-        /// <response code="400">'Id' parameter must be null</response>
         /// <response code="404">'Patient' not found</response>
         [HttpDelete("{id:guid}")]
         [ProducesResponseType(204)]

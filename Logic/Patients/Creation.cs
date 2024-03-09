@@ -20,6 +20,7 @@ namespace Logic.Patients
             #endregion
 
             #region Properties
+            public Guid? Id { get; set; }
             public string Use { get; set; }
             public string Family { get; set; }
             public List<string> Given { get; set; }
@@ -53,6 +54,9 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
+                if (this.Id != null)
+                    return false;
+
                 if (string.IsNullOrWhiteSpace(this.Use) == true)
                     return false;
 
