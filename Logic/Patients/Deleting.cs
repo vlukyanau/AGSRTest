@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
-using System.Transactions;
-using Logic.Entities;
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.EntityFrameworkCore;
+
+using Logic.Entities;
 
 
 namespace Logic.Patients
@@ -31,14 +30,14 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public async Task<StatusCodeResult> Go()
+            public async Task<IResult> Go()
             {
                 try
                 {
                     if (this.Verify() == false)
-                        return new BadRequestResult();
+                        return Result.Fail;
 
-                    StatusCodeResult result = await this.Process();
+                    IResult result = await this.Process();
 
                     return result;
                 }
@@ -46,7 +45,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return new BadRequestResult();
+                    return Result.Fail;
                 }
             }
             #endregion
@@ -60,20 +59,20 @@ namespace Logic.Patients
                 return true;
             }
 
-            private async Task<StatusCodeResult> Process()
+            private async Task<IResult> Process()
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
-                    Patient patient = await context.Patients.SingleAsync(item => item.Id == this.Id);
+                    Patient patient = await context.Patients.FirstOrDefaultAsync(item => item.Id == this.Id);
                     if (patient == null)
-                        return new NotFoundResult();
+                        return Result.NotFound;
 
                     context.Patients.Remove(patient);
 
                     await context.SaveChangesAsync();
                 }
 
-                return new OkResult();
+                return Result.NoContent;
             }
             #endregion
         }

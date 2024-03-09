@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Transactions;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -23,11 +21,11 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public async Task<IReadOnlyList<IPatient>> Go()
+            public async Task<IResult> Go()
             {
                 try
                 {
-                    IReadOnlyList<IPatient> result = await this.Process();
+                    IResult result = await this.Process();
 
                     return result;
                 }
@@ -35,15 +33,14 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return new List<IPatient>();
-                    //return new BadRequestResult();
+                    return Result.Fail;
                 }
             }
-            public async Task<IPatient> Go(Guid id)
+            public async Task<IResult> Go(Guid id)
             {
                 try
                 {
-                    IPatient result = await this.Process(id);
+                    IResult result = await this.Process(id);
 
                     return result;
                 }
@@ -51,29 +48,30 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Patient.New("Error", DateTime.Now);
-                    //return new BadRequestResult();
+                    return Result.Fail;
                 }
             }
             #endregion
 
             #region Assistants
-            private async Task<IReadOnlyList<IPatient>> Process()
+            private async Task<IResult> Process()
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
                     IReadOnlyList<Patient> patients = await context.Patients.Include(patient => patient.Name).ToListAsync();
 
-                    return patients;
+                    return Result.New(patients);
                 }
             }
-            private async Task<IPatient> Process(Guid id)
+            private async Task<IResult> Process(Guid id)
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
                     Patient patient = await context.Patients.Include(patient => patient.Name).SingleAsync(item => item.Id == id);
+                    if (patient == null)
+                        return Result.NotFound;
 
-                    return patient;
+                    return Result.New(patient);
                 }
             }
             #endregion

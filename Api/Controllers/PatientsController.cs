@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Api.Results;
-
+using Logic;
 using Logic.Patients;
+
 using Api.Models;
+using Api.Results;
 
 
 namespace Api.Controllers
@@ -21,7 +21,7 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            var result = await retrieving.Go();
+            IResult result = await retrieving.Go();
 
             return new OutputResult(result);
         }
@@ -31,13 +31,13 @@ namespace Api.Controllers
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            var result = await retrieving.Go(id);
+            IResult result = await retrieving.Go(id);
 
             return new OutputResult(result);
         }
 
         [HttpGet("birthDate")]
-        public async Task<IActionResult> Search([FromQuery]DateTime[] date)
+        public async Task<IActionResult> Search([FromQuery] DateTime[] date)
         {
             await Task.CompletedTask;
 
@@ -55,9 +55,9 @@ namespace Api.Controllers
             creation.BirthDate = patient.BirthDate;
             creation.Active = patient.Active;
 
-            StatusCodeResult result = await creation.Go();
+            IResult result = await creation.Go();
 
-            return result;
+            return new OutputResult(result);
         }
 
         [HttpPut]
@@ -72,9 +72,9 @@ namespace Api.Controllers
             updating.BirthDate = patient.BirthDate;
             updating.Active = patient.Active;
 
-            StatusCodeResult result = await updating.Go();
+            IResult result = await updating.Go();
 
-            return result;
+            return new OutputResult(result);
         }
 
         [HttpDelete("{id:guid}")]
@@ -83,9 +83,9 @@ namespace Api.Controllers
             Patients.Deleting deleting = Patients.Deleting.New();
             deleting.Id = id;
 
-            StatusCodeResult result = await deleting.Go();
+            IResult result = await deleting.Go();
 
-            return result;
+            return new OutputResult(result);
         }
     }
 }

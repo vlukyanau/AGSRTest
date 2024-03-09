@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Logic.Entities;
@@ -32,14 +31,14 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public async Task<StatusCodeResult> Go()
+            public async Task<IResult> Go()
             {
                 try
                 {
                     if (this.Verify() == false)
-                        return new BadRequestResult();
+                        return Result.Fail;
 
-                    StatusCodeResult result = await this.Process();
+                    IResult result = await this.Process();
 
                     return result;
                 }
@@ -47,7 +46,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return new BadRequestResult();
+                    return Result.Fail;
                 }
             }
             #endregion
@@ -67,13 +66,13 @@ namespace Logic.Patients
                 return true;
             }
 
-            private async Task<StatusCodeResult> Process()
+            private async Task<IResult> Process()
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
                     Patient patient = await context.Patients.Include(item => item.Name).SingleAsync(item => item.Id == this.Id);
                     if (patient == null)
-                        return new NotFoundResult();
+                        return Result.Fail;
 
                     patient.Name.Use = this.Use;
                     patient.Name.Family = this.Family;
@@ -87,7 +86,7 @@ namespace Logic.Patients
                     await context.SaveChangesAsync();
                 }
 
-                return new OkResult();
+                return Result.Ok;
             }
             #endregion
         }

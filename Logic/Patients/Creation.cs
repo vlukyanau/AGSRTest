@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Mvc;
-
 using Logic.Entities;
 
 
@@ -30,22 +28,23 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public async Task<StatusCodeResult> Go()
+            public async Task<IResult> Go()
             {
                 try
                 {
                     if (this.Verify() == false)
-                        return new BadRequestResult();
+                        return Result.Fail;
 
-                    StatusCodeResult result = await this.Process();
+                    IResult result = await this.Process();
 
                     return result;
+
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
 
-                    return new BadRequestResult();
+                    return Result.Fail;
                 }
             }
             #endregion
@@ -62,7 +61,7 @@ namespace Logic.Patients
                 return true;
             }
 
-            private async Task<StatusCodeResult> Process()
+            private async Task<IResult> Process()
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
@@ -75,9 +74,9 @@ namespace Logic.Patients
                     await context.AddAsync(patient);
 
                     await context.SaveChangesAsync();
-                }
 
-                return new OkResult();
+                    return Result.New(patient, Result.Created);
+                }
             }
             #endregion
         }

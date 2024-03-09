@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using Microsoft.AspNetCore.Mvc;
+
+using Logic;
 
 
 namespace Api.Results
@@ -21,14 +23,10 @@ namespace Api.Results
         #endregion
 
         #region Constructors
-        public OutputResult(object result)
-            : base(result, OutputResult.GetSettings())
+        public OutputResult(IResult result)
+            : base(result.Data, OutputResult.GetSettings())
         {
-        }
-        public OutputResult(HttpStatusCode code, object result)
-            : base(result, OutputResult.GetSettings())
-        {
-            this.StatusCode = (int)code;
+            this.StatusCode = (int)result.Code;
         }
         #endregion
     }

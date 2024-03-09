@@ -3,7 +3,7 @@
 
 namespace Logic.Entities
 {
-    public interface IPatient
+    public interface IPatient : IEntity
     {
         public Guid Id { get; }
         public HumanName Name { get; }
