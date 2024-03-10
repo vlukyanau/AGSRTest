@@ -94,7 +94,7 @@ namespace Logic.Patients
                     {
                         IReadOnlyDictionary<Guid, Patient> patients = await this.GetPatients();
 
-                        IReadOnlyList<Guid> ids = patients.Keys.ToList();
+                        IReadOnlyList<Guid> ids = patients.Values.Ids(item => item.HumanNameId);
 
                         IQueryable<HumanName> humanNames = this.Work.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
 

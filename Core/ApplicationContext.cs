@@ -1,7 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+
+using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 
 using Core.Entities;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 
 namespace Core
@@ -20,11 +23,13 @@ namespace Core
         }
         #endregion
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        #region Overriding
+        protected override void OnConfiguring(DbContextOptionsBuilder builder)
         {
-            options.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=postgres;Password=FDgsd32Fkfsj2kfkv11");
+            builder.UseNpgsql("Host=postgres;Port=5432;Database=db;Username=postgres;Password=FDgsd32Fkfsj2kfkv11");
 
-            base.OnConfiguring(options);
+            base.OnConfiguring(builder);
         }
+        #endregion
     }
 }
