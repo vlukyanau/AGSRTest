@@ -41,7 +41,6 @@ namespace Api.Controllers
         /// <response code="200"></response>
         /// <response code="404">Patient not found</response>
         [HttpGet("{id:guid}")]
-        [ProducesResponseType(200)]
         public async Task<IActionResult> Get(Guid id)
         {
             Patients.Retrieving retrieving = Patients.Retrieving.New();
@@ -55,7 +54,12 @@ namespace Api.Controllers
         /// Search 'Patient' by 'Date' parameter.
         /// </summary>
         /// <param name="dates"></param>
+        /// <remarks>
+        /// **More information:** [hl7 Search](https://www.hl7.org/fhir/search.html#date)
+        /// </remarks>
         /// <returns></returns>
+        /// <response code="200"></response>
+        /// <response code="400">Invalid parameters</response>
         [HttpGet("birthdate")]
         public async Task<IActionResult> Search([FromQuery] string[] dates)
         {

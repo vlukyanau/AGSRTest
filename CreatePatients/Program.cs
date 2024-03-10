@@ -55,7 +55,17 @@ namespace CreatePatients
 
         private static async Task Run()
         {
-            client.BaseAddress = new Uri("https://localhost:7141/");
+            Console.WriteLine("Press [Enter] to run...");
+
+            ConsoleKeyInfo key = Console.ReadKey(true);
+            if (key.Key != ConsoleKey.Enter)
+                return;
+
+            Console.WriteLine();
+
+            Console.WriteLine("**************START**************");
+
+            client.BaseAddress = new Uri("http://localhost:8080/");
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -88,6 +98,8 @@ namespace CreatePatients
             {
                 Console.WriteLine(e.Message);
             }
+
+            Console.WriteLine("**************END**************");
 
             Console.ReadLine();
         }

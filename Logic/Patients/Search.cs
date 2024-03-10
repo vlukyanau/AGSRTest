@@ -53,7 +53,7 @@ namespace Logic.Patients
 
                 #region Properties
                 private IWork Work { get; }
-                private IReadOnlyList<Tuple> Dates;
+                private IReadOnlyList<Tuple> Dates { get; }
 
                 private IReadOnlyDictionary<Guid, Patient> Patients { get; set; }
                 private IReadOnlyDictionary<Guid, HumanName> HumanNames { get; set; }
@@ -246,6 +246,9 @@ namespace Logic.Patients
             {
                 try
                 {
+                    if (this.Verify() == false)
+                        return Result.BadRequest;
+
                     IResult result = await this.Process();
 
                     return result;
@@ -260,20 +263,19 @@ namespace Logic.Patients
             #endregion
 
             #region Assistants
+            private bool Verify()
+            {
+                if (this.Dates.Count == 0)
+                    return false;
+
+                return true;
+            }
+
             private async Task<IResult> Process()
             {
                 ILoading loading = new Loading(this.work, this.Dates);
 
                 IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients(); //this.GetPatients();
-
-                //foreach (Tuple date in this.Dates)
-                //{
-                //    query = this.FilterDate(query, date);
-                //    if (query == null)
-                //        return Result.BadRequest;
-                //}
-
-                //IReadOnlyList<Patient> patients = await query.ToListAsync();
 
                 List<PatientInfo> infos = new List<PatientInfo>();
 
