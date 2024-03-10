@@ -87,7 +87,7 @@ namespace Logic.Patients
                     patient.Name.Family = this.Family;
                     patient.Name.Given.AddRange(this.Given);
                     patient.Gender = this.Gender;
-                    patient.BirthDate = (DateTime)this.BirthDate;
+                    patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
                     patient.Active = this.Active;
 
                     await context.AddAsync(patient);

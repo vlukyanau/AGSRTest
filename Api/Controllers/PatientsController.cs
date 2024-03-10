@@ -54,14 +54,16 @@ namespace Api.Controllers
         /// <summary>
         /// Search 'Patient' by 'Date' parameter.
         /// </summary>
-        /// <param name="date"></param>
+        /// <param name="dates"></param>
         /// <returns></returns>
-        [HttpGet("birthDate")]
-        public async Task<IActionResult> Search([FromQuery] DateTime[] date)
+        [HttpGet("birthdate")]
+        public async Task<IActionResult> Search([FromQuery] string[] dates)
         {
-            await Task.CompletedTask;
+            Patients.Retrieving retrieving = Patients.Retrieving.New();
 
-            return new OkResult();
+            IResult result = await retrieving.Go(dates);
+
+            return new OutputResult(result);
         }
 
         /// <summary>
