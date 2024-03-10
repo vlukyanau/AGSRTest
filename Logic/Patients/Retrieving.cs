@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
-using Core.Entities;
-using Core.Repository;
 using Core;
+using Core.Entities;
+
+using Logic.Models;
 
 
 namespace Logic.Patients
@@ -16,18 +17,88 @@ namespace Logic.Patients
     {
         public sealed class Retrieving
         {
-            #region Enums
-            private enum Prefix
+            #region Interfaces
+            private interface ILoading
             {
-                eq = 0,   // Equal
-                ne,       // NotEqual
-                gt,       // GreaterThan
-                lt,       // LessThan
-                ge,       // GreaterthanOrEquals
-                le,       // LessThanOrEquals
-                sa,       // StartAfter
-                eb,       // EndBefore
-                ap        // Approximate
+                Task<IReadOnlyDictionary<Guid, Patient>> GetPatients();
+                Task<Patient> GetPatient(Guid id);
+                Task<HumanName> GetHumanName(Guid id);
+            }
+            #endregion
+
+            #region Classes
+            private class Loading : ILoading
+            {
+                #region Constructors
+                public Loading(IWork work)
+                {
+                    this.Work = work;
+                }
+                #endregion
+
+                #region Properties
+                private IWork Work { get; }
+
+                private IReadOnlyDictionary<Guid, Patient> Patients { get; set; }
+                private IReadOnlyDictionary<Guid, HumanName> HumanNames { get; set; }
+                #endregion
+
+                #region ILoading
+                Task<IReadOnlyDictionary<Guid, Patient>> ILoading.GetPatients()
+                {
+                    return this.GetPatients();
+                }
+                Task<Patient> ILoading.GetPatient(Guid id)
+                {
+                    return this.GetPatient(id);
+                }
+                Task<HumanName> ILoading.GetHumanName(Guid id)
+                {
+                    return this.GetHumanName(id);
+                }
+                #endregion
+
+                #region Assistents
+                private async Task<IReadOnlyDictionary<Guid, Patient>> GetPatients()
+                {
+                    if (this.Patients == null)
+                    {
+                        IQueryable<Patient> patients = this.Work.Patients.GetAll();
+
+                        this.Patients = await patients.ToDictionaryAsync(item => item.Id);
+                    }
+
+                    return this.Patients;
+                }
+                private async Task<Patient> GetPatient(Guid id)
+                {
+                    IReadOnlyDictionary<Guid, Patient> patients = await this.GetPatients();
+
+                    return patients.GetValueOrDefault(id);
+                }
+
+                private async Task<IReadOnlyDictionary<Guid, HumanName>> GetHumanNames()
+                {
+                    if (this.HumanNames == null)
+                    {
+                        IReadOnlyDictionary<Guid, Patient> patients = await this.GetPatients();
+
+                        IReadOnlyList<Guid> ids = patients.Keys.ToList();
+
+                        IQueryable<HumanName> humanNames = this.Work.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
+
+                        this.HumanNames = await humanNames.ToDictionaryAsync(item => item.Id);
+                    }
+
+                    return this.HumanNames;
+                }
+                private async Task<HumanName> GetHumanName(Guid id)
+                {
+                    IReadOnlyDictionary<Guid, HumanName> humanNames = await this.GetHumanNames();
+
+                    return humanNames.GetValueOrDefault(id);
+                }
+                #endregion
             }
             #endregion
 
@@ -38,48 +109,15 @@ namespace Logic.Patients
             }
             #endregion
 
-            #region Classes
-            private class Tuple
-            {
-                #region Static
-                public static Tuple New(string date)
-                {
-                    if (Enum.TryParse(date[..2], true, out Prefix prefix) == false)
-                        return null;
-
-                    if (DateTime.TryParse(date[2..], out DateTime result) == false)
-                        return null;
-
-                    Tuple tuple = new Tuple();
-                    tuple.Date = result.ToUniversalTime();
-                    tuple.Prefix = prefix;
-
-                    return tuple;
-                }
-                #endregion
-
-                #region Constructors
-                private Tuple()
-                {
-                }
-                #endregion
-
-                #region Properties
-                public DateTime Date { get; private set; }
-                public Prefix Prefix { get; private set; }
-                #endregion
-            }
-            #endregion
-
             #region Constructors
             private Retrieving()
             {
-                this.context = new ApplicationContext();
+                this.work = Work.New();
             }
             #endregion
 
             #region Fields
-            private readonly ApplicationContext context;
+            private readonly IWork work;
             #endregion
 
             #region Methods
@@ -88,8 +126,6 @@ namespace Logic.Patients
                 try
                 {
                     IResult result = await this.Process();
-
-                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -106,27 +142,6 @@ namespace Logic.Patients
                 {
                     IResult result = await this.Process(id);
 
-                    await this.context.DisposeAsync();
-
-                    return result;
-                }
-                catch (Exception exception)
-                {
-                    Console.WriteLine(exception);
-
-                    await this.context.DisposeAsync();
-
-                    return Result.BadRequest;
-                }
-            }
-            public async Task<IResult> Go(IReadOnlyList<string> dates)
-            {
-                try
-                {
-                    IResult result = await this.Process(dates);
-
-                    await this.context.DisposeAsync();
-
                     return result;
                 }
                 catch (Exception exception)
@@ -141,89 +156,40 @@ namespace Logic.Patients
             #region Assistants
             private async Task<IResult> Process()
             {
-                IReadOnlyList<Patient> patients = await this.GetPatients().ToListAsync();
+                ILoading loading = new Loading(this.work);
 
-                return Result.New(patients);
+                IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients();
+
+                List<IPatientInfo> infos = new List<IPatientInfo>();
+
+                foreach ((_, IPatient patient) in patients)
+                {
+                    HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
+                    if (humanName == null)
+                        return Result.BadRequest;
+
+                    PatientInfo info = PatientInfo.New(patient, humanName);
+
+                    infos.Add(info);
+                }
+
+                return Result.New(infos);
             }
             private async Task<IResult> Process(Guid id)
             {
-                Patient patient = await this.GetPatients().FirstOrDefaultAsync(item => item.Id == id);
+                ILoading loading = new Loading(this.work);
+
+                Patient patient = await loading.GetPatient(id);
                 if (patient == null)
                     return Result.NotFound;
 
-                return Result.New(patient);
-            }
-            private async Task<IResult> Process(IReadOnlyList<string> dates)
-            {
-                if (dates.Count == 0 || dates.Count > 2)
+                HumanName name = await loading.GetHumanName(patient.HumanNameId);
+                if (name == null)
                     return Result.BadRequest;
 
-                IQueryable<Patient> query = this.GetPatients();
+                IPatientInfo info = PatientInfo.New(patient, name);
 
-                foreach (string date in dates)
-                {
-                    query = this.FilterDate(query, date);
-                    if (query == null)
-                        return Result.BadRequest;
-                }
-
-                IReadOnlyList<Patient> patients = await query.ToListAsync();
-
-                return Result.New(patients);
-            }
-
-            private IQueryable<Patient> GetPatients()
-            {
-                return this.context.Patients.Include(patient => patient.Name);
-            }
-
-            private IQueryable<Patient> FilterDate(IQueryable<Patient> query, string date)
-            {
-                Tuple tuple = Tuple.New(date);
-                if (tuple == null)
-                    return null;
-
-                switch (tuple.Prefix)
-                {
-                    case Prefix.eq:
-                        query = query.Where(patient => patient.BirthDate == tuple.Date);
-                        break;
-
-                    case Prefix.ne:
-                        query = query.Where(patient => patient.BirthDate != tuple.Date);
-                        break;
-
-                    case Prefix.gt:
-                        query = query.Where(patient => patient.BirthDate > tuple.Date);
-                        break;
-
-                    case Prefix.lt:
-                        query = query.Where(patient => patient.BirthDate < tuple.Date);
-                        break;
-
-                    case Prefix.ge:
-                        query = query.Where(patient => patient.BirthDate >= tuple.Date);
-                        break;
-
-                    case Prefix.le:
-                        query = query.Where(patient => patient.BirthDate <= tuple.Date);
-                        break;
-
-                    // TODO: Implement
-                    case Prefix.sa:
-                        return null;
-
-                    case Prefix.eb:
-                        return null;
-
-                    case Prefix.ap:
-                        return null;
-
-                    default:
-                        return null;
-                }
-
-                return query;
+                return Result.New(info);
             }
             #endregion
         }

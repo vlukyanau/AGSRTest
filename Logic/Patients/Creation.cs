@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Core;
 using Core.Entities;
+
+using Logic.Models;
 
 
 namespace Logic.Patients
@@ -22,12 +25,12 @@ namespace Logic.Patients
             #region Constructors
             private Creation()
             {
-                this.context = new ApplicationContext();
+                this.work = Work.New();
             }
             #endregion
 
             #region Fields
-            private readonly ApplicationContext context;
+            private readonly IWork work;
             #endregion
 
             #region Properties
@@ -49,9 +52,6 @@ namespace Logic.Patients
                         return Result.BadRequest;
 
                     IResult result = await this.Process();
-
-                    await this.context.SaveChangesAsync();
-                    await this.context.DisposeAsync();
 
                     return result;
 
@@ -94,17 +94,24 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                Patient patient = Patient.New();
-                patient.Name.Use = this.Use;
-                patient.Name.Family = this.Family;
-                patient.Name.Given.AddRange(this.Given);
+                HumanName name = HumanName.New();
+                name.Use = this.Use;
+                name.Family = this.Family;
+                name.Given.AddRange(this.Given);
+
+                Patient patient = Patient.New(name.Id);
                 patient.Gender = this.Gender;
                 patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
                 patient.Active = this.Active;
 
-                await this.context.AddAsync(patient);
+                await this.work.HumanNames.Add(name);
+                await this.work.Patients.Add(patient);
 
-                return Result.New(patient, Result.Created);
+                this.work.Save();
+
+                PatientInfo info = PatientInfo.New(patient, name);
+
+                return Result.New(info, Result.Created);
             }
             #endregion
         }

@@ -3,10 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
-using Microsoft.EntityFrameworkCore;
-
-using Core.Entities;
 using Core;
+using Core.Entities;
 
 
 namespace Logic.Patients
@@ -25,12 +23,12 @@ namespace Logic.Patients
             #region Constructors
             private Updating()
             {
-                this.context = new ApplicationContext();
+                this.work = Work.New();
             }
             #endregion
 
             #region Fields
-            private readonly ApplicationContext context;
+            private readonly IWork work;
             #endregion
 
             #region Properties
@@ -52,9 +50,6 @@ namespace Logic.Patients
                         return Result.BadRequest;
 
                     IResult result = await this.Process();
-
-                    await this.context.SaveChangesAsync();
-                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -96,18 +91,26 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                Patient patient = await this.context.Patients.Include(item => item.Name).FirstOrDefaultAsync(item => item.Id == this.Id);
+                Patient patient = await this.work.Patients.GetId((Guid)this.Id);
                 if (patient == null)
                     return Result.BadRequest;
 
-                patient.Name.Use = this.Use;
-                patient.Name.Family = this.Family;
-                patient.Name.Given = this.Given;
+                HumanName name = await this.work.HumanNames.GetId(patient.HumanNameId);
+                if (name == null)
+                    return Result.BadRequest;
+
                 patient.Gender = this.Gender;
                 patient.BirthDate = (DateTime)this.BirthDate;
                 patient.Active = this.Active;
 
-                this.context.Update(patient);
+                name.Use = this.Use;
+                name.Family = this.Family;
+                name.Given = this.Given;
+
+                this.work.HumanNames.Update(name);
+                this.work.Patients.Update(patient);
+
+                this.work.Save();
 
                 return Result.NoContent;
             }

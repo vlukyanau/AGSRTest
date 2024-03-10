@@ -3,14 +3,14 @@
 
 namespace Core.Entities
 {
-    public sealed class Patient : IPatient
+    public sealed class Patient : Entity, IPatient
     {
         #region Static
-        public static Patient New()
+        public static Patient New(Guid humanNameId)
         {
             Patient patient = new Patient();
             patient.Id = Guid.NewGuid();
-            patient.Name = HumanName.New();
+            patient.HumanNameId = humanNameId;
 
             return patient;
         }
@@ -23,8 +23,8 @@ namespace Core.Entities
         #endregion
 
         #region Properties
-        public Guid Id { get; set; }
-        public HumanName Name { get; set; }
+        public Guid Id { get; private set; }
+        public Guid HumanNameId { get; private set; }
         public Gender? Gender { get; set; }
         public DateTime BirthDate { get; set; }
         public bool? Active { get; set; }

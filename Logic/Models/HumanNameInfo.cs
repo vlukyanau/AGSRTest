@@ -2,14 +2,29 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
+using Core.Entities;
 
-namespace Api.Models
+
+namespace Logic.Models
 {
     /// <summary>
     /// A name associated with the patient  
     /// </summary>
-    public sealed class HumanName : IHumanName
+    public sealed class HumanNameInfo : IHumanNameInfo
     {
+        #region Static
+        public static HumanNameInfo New(IHumanName name)
+        {
+            HumanNameInfo info = new HumanNameInfo();
+            info.Id = name.Id;
+            info.Use = name.Use;
+            info.Family = name.Family;
+            info.Given = name.Given;
+
+            return info;
+        }
+        #endregion
+        
         #region Properties
         /// <summary>
         /// Id 

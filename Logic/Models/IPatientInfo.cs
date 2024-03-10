@@ -3,12 +3,12 @@
 using Core.Entities;
 
 
-namespace Api.Models
+namespace Logic.Models
 {
-    public interface IPatient
+    public interface IPatientInfo : IEntry
     {
         public Guid? Id { get; }
-        public HumanName Name { get; }
+        public HumanNameInfo Name { get; }
         public Gender? Gender { get; }
         public DateTime? BirthDate { get; }
         public bool? Active { get; }

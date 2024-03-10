@@ -3,10 +3,10 @@
 
 namespace Core.Entities
 {
-    public interface IPatient : IEntity
+    public interface IPatient
     {
         public Guid Id { get; }
-        public HumanName Name { get; }
+        public Guid HumanNameId { get; }
         public Gender? Gender { get; }
         public DateTime BirthDate { get; }
         public bool? Active { get; }

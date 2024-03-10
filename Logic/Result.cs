@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 
-using Core.Entities;
+using Logic.Models;
 
 
 namespace Logic
@@ -38,7 +38,7 @@ namespace Logic
 
             return result;
         }
-        public static Result New(IReadOnlyList<IEntity> data, HttpStatusCode code = HttpStatusCode.OK)
+        public static Result New(IReadOnlyList<IEntry> data, HttpStatusCode code = HttpStatusCode.OK)
         {
             Result result = new Result();
             result.Data = data;
@@ -46,7 +46,7 @@ namespace Logic
 
             return result;
         }
-        public static Result New(IEntity data, HttpStatusCode code = HttpStatusCode.OK)
+        public static Result New(IEntry data, HttpStatusCode code = HttpStatusCode.OK)
         {
             Result result = new Result();
             result.Data = data;

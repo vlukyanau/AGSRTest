@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Core.Entities
 {
-    public interface IHumanName : IEntity
+    public interface IHumanName
     {
         public Guid Id { get; }
         public string Use { get; }

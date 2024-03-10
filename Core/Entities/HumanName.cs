@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Core.Entities
 {
-    public sealed class HumanName : IHumanName
+    public sealed class HumanName : Entity, IHumanName
     {
         #region Static
         public static HumanName New()

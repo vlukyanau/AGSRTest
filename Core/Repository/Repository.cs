@@ -1,6 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using Core.Entities;
 
 
 namespace Core.Repository
@@ -14,14 +18,14 @@ namespace Core.Repository
             this.context = context;
         }
 
-        public async Task<T> GetId(int id)
+        public async Task<T> GetId(Guid id)
         {
             return await this.context.Set<T>().FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public DbSet<T> GetAll()
         {
-            return await this.context.Set<T>().ToListAsync();
+            return this.context.Set<T>();
         }
 
         public async Task Add(T entity)

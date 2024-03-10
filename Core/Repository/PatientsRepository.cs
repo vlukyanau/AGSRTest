@@ -3,9 +3,14 @@
 
 namespace Core.Repository
 {
-    public class ProductRepository : Repository<Patient>, IPatientRepository
+    internal class PatientsRepository : Repository<Patient>, IPatientsRepository
     {
-        public ProductRepository(ApplicationContext context) : base(context)
+        public static PatientsRepository New(ApplicationContext context)
+        {
+            return new PatientsRepository(context);
+        }
+
+        private PatientsRepository(ApplicationContext context) : base(context)
         {
         }
     }

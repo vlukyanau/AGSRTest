@@ -8,6 +8,11 @@ using Microsoft.Extensions.Hosting;
 
 using Api.Swagger;
 
+using Core;
+using Core.Repository;
+
+using Microsoft.EntityFrameworkCore;
+
 
 namespace Api
 {
@@ -31,13 +36,21 @@ namespace Api
                 options.SchemaFilter<EnumSchemaFilter>();
             });
 
+            //builder.Services.AddDbContext<ApplicationContext>(options =>
+            //{
+            //    //options.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=postgres;Password=FDgsd32Fkfsj2kfkv11");
+            //    //options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+            //});
+
+            //builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.UseSwagger();
-                app.UseSwaggerUI();
+            app.UseSwagger();
+            app.UseSwaggerUI();
             //}
 
             app.UseHttpsRedirection();

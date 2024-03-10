@@ -4,13 +4,27 @@ using System.ComponentModel.DataAnnotations;
 using Core.Entities;
 
 
-namespace Api.Models
+namespace Logic.Models
 {
     /// <summary>
     /// Information about an individual or animal receiving health care services
     /// </summary>
-    public sealed class Patient : IPatient
+    public sealed class PatientInfo : IPatientInfo
     {
+        #region Static
+        public static PatientInfo New(IPatient patient, IHumanName humanName)
+        {
+            PatientInfo info = new PatientInfo();
+            info.Id = patient.Id;
+            info.Name = HumanNameInfo.New(humanName);
+            info.Gender = patient.Gender;
+            info.BirthDate = patient.BirthDate;
+            info.Active = patient.Active;
+
+            return info;
+        }
+        #endregion
+        
         #region Properties
         /// <summary>
         /// Id 
@@ -20,7 +34,7 @@ namespace Api.Models
         /// <summary>
         /// A name associated with the patient
         /// </summary>
-        public HumanName Name { get; set; }
+        public HumanNameInfo Name { get; set; }
 
         /// <summary>
         /// male | female | other | unknown

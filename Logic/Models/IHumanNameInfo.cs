@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 
 
-namespace Api.Models
+namespace Logic.Models
 {
-    public interface IHumanName
+    public interface IHumanNameInfo : IEntry
     {
         public Guid? Id { get; }
         public string Use { get; }

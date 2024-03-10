@@ -3,7 +3,7 @@
 
 namespace Core.Repository
 {
-    public interface IPatientsRepository : IRepository<Patient>
+    public interface IHumanNamesRepository : IRepository<HumanName>
     {
     }
 }

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Api.Models;
-using Api.Results;
-
 using Logic;
 using Logic.Patients;
+using Logic.Models;
+
+using Api.Results;
 
 
 namespace Api.Controllers
@@ -59,9 +59,13 @@ namespace Api.Controllers
         [HttpGet("birthdate")]
         public async Task<IActionResult> Search([FromQuery] string[] dates)
         {
-            Patients.Retrieving retrieving = Patients.Retrieving.New();
+            Patients.Search search = Patients.Search.New();
 
-            IResult result = await retrieving.Go(dates);
+            IResult addResult = search.AddRange(dates);
+            if (addResult == Result.BadRequest)
+                return new OutputResult(addResult);
+
+            IResult result = await search.Go();
 
             return new OutputResult(result);
         }
@@ -93,7 +97,7 @@ namespace Api.Controllers
         /// <response code="400">Invalid parameters</response>
         [HttpPost]
         [ProducesResponseType(201)]
-        public async Task<IActionResult> Post([FromBody] Patient patient)
+        public async Task<IActionResult> Post([FromBody] PatientInfo patient)
         {
             Patients.Creation creation = Patients.Creation.New();
             creation.Id = patient.Id;
@@ -139,7 +143,7 @@ namespace Api.Controllers
         /// <response code="404">'Patient' not found</response>
         [HttpPut]
         [ProducesResponseType(204)]
-        public async Task<IActionResult> Put([FromBody] Patient patient)
+        public async Task<IActionResult> Put([FromBody] PatientInfo patient)
         {
             Patients.Updating updating = Patients.Updating.New();
             updating.Id = patient.Id;
