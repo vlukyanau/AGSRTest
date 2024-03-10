@@ -82,10 +82,12 @@ namespace Logic.Patients
             {
                 using (ApplicationContext context = new ApplicationContext())
                 {
-                    Patient patient = Patient.New(this.Family, (DateTime)this.BirthDate);
+                    Patient patient = Patient.New();
                     patient.Name.Use = this.Use;
+                    patient.Name.Family = this.Family;
                     patient.Name.Given.AddRange(this.Given);
                     patient.Gender = this.Gender;
+                    patient.BirthDate = (DateTime)this.BirthDate;
                     patient.Active = this.Active;
 
                     await context.AddAsync(patient);

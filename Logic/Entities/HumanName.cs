@@ -7,11 +7,10 @@ namespace Logic.Entities
     public sealed class HumanName : IHumanName
     {
         #region Static
-        public static HumanName New(string family)
+        public static HumanName New()
         {
             HumanName name = new HumanName();
             name.Id = Guid.NewGuid();
-            name.Family = family;
             name.Given = new List<string>();
 
             return name;
