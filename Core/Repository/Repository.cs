@@ -1,10 +1,7 @@
 ﻿using System;
 
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Core.Entities;
 
 
 namespace Core.Repository

@@ -94,22 +94,22 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                HumanName name = HumanName.New();
-                name.Use = this.Use;
-                name.Family = this.Family;
-                name.Given.AddRange(this.Given);
+                HumanName humanName = HumanName.New();
+                humanName.Use = this.Use;
+                humanName.Family = this.Family;
+                humanName.Given.AddRange(this.Given);
 
-                Patient patient = Patient.New(name.Id);
+                Patient patient = Patient.New(humanName.Id);
                 patient.Gender = this.Gender;
                 patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
                 patient.Active = this.Active;
 
-                await this.work.HumanNames.Add(name);
+                await this.work.HumanNames.Add(humanName);
                 await this.work.Patients.Add(patient);
 
                 this.work.Save();
 
-                PatientInfo info = PatientInfo.New(patient, name);
+                PatientInfo info = PatientInfo.New(patient, humanName);
 
                 return Result.New(info, Result.Created);
             }

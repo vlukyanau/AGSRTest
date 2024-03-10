@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-using Microsoft.EntityFrameworkCore;
-
-using Core.Entities;
 using Core;
-using Core.Repository;
+using Core.Entities;
 
 
 namespace Logic.Patients
@@ -61,11 +58,11 @@ namespace Logic.Patients
                 if (patient == null)
                     return Result.NotFound;
 
-                HumanName name = await this.work.HumanNames.GetId(patient.HumanNameId);
-                if (name == null)
+                HumanName humanName = await this.work.HumanNames.GetId(patient.HumanNameId);
+                if (humanName == null)
                     return Result.NotFound;
 
-                this.work.HumanNames.Delete(name);
+                this.work.HumanNames.Delete(humanName);
                 this.work.Patients.Delete(patient);
 
                 this.work.Save();

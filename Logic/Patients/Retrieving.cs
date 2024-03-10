@@ -183,11 +183,11 @@ namespace Logic.Patients
                 if (patient == null)
                     return Result.NotFound;
 
-                HumanName name = await loading.GetHumanName(patient.HumanNameId);
-                if (name == null)
+                HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
+                if (humanName == null)
                     return Result.BadRequest;
 
-                IPatientInfo info = PatientInfo.New(patient, name);
+                IPatientInfo info = PatientInfo.New(patient, humanName);
 
                 return Result.New(info);
             }

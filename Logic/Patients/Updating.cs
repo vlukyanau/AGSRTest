@@ -95,19 +95,19 @@ namespace Logic.Patients
                 if (patient == null)
                     return Result.BadRequest;
 
-                HumanName name = await this.work.HumanNames.GetId(patient.HumanNameId);
-                if (name == null)
+                HumanName humanName = await this.work.HumanNames.GetId(patient.HumanNameId);
+                if (humanName == null)
                     return Result.BadRequest;
 
                 patient.Gender = this.Gender;
                 patient.BirthDate = (DateTime)this.BirthDate;
                 patient.Active = this.Active;
 
-                name.Use = this.Use;
-                name.Family = this.Family;
-                name.Given = this.Given;
+                humanName.Use = this.Use;
+                humanName.Family = this.Family;
+                humanName.Given = this.Given;
 
-                this.work.HumanNames.Update(name);
+                this.work.HumanNames.Update(humanName);
                 this.work.Patients.Update(patient);
 
                 this.work.Save();

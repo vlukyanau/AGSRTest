@@ -9,11 +9,11 @@ namespace Core.Entities
         #region Static
         public static HumanName New()
         {
-            HumanName name = new HumanName();
-            name.Id = Guid.NewGuid();
-            name.Given = new List<string>();
+            HumanName humanName = new HumanName();
+            humanName.Id = Guid.NewGuid();
+            humanName.Given = new List<string>();
 
-            return name;
+            return humanName;
         }
         #endregion
 

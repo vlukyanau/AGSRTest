@@ -24,7 +24,7 @@ namespace Logic.Models
             return info;
         }
         #endregion
-        
+
         #region Properties
         /// <summary>
         /// Id 
