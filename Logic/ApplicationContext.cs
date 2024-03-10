@@ -15,7 +15,7 @@ namespace Logic
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseNpgsql("Host=agsrtest-db-1;Port=5432;Database=db;Username=postgres;Password=FDgsd32Fkfsj2kfkv11");
+            options.UseNpgsql("Host=postgres;Port=5432;Database=db;Username=postgres;Password=FDgsd32Fkfsj2kfkv11");
         }
     }
 }

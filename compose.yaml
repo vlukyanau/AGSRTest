@@ -26,6 +26,7 @@ services:
         condition: service_healthy
   db:
     image: postgres
+    hostname: postgres
     restart: always
     user: postgres
     secrets:
