@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-using Logic.Entities;
+using Core.Entities;
 
 
 namespace Api.Models

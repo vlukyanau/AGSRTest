@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 
-using Logic.Entities;
+using Core.Entities;
 
 
 namespace Logic

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
-using Logic.Entities;
+using Core;
+using Core.Entities;
 
 
 namespace Logic.Patients
@@ -17,6 +17,17 @@ namespace Logic.Patients
             {
                 return new Creation();
             }
+            #endregion
+
+            #region Constructors
+            private Creation()
+            {
+                this.context = new ApplicationContext();
+            }
+            #endregion
+
+            #region Fields
+            private readonly ApplicationContext context;
             #endregion
 
             #region Properties
@@ -38,6 +49,9 @@ namespace Logic.Patients
                         return Result.BadRequest;
 
                     IResult result = await this.Process();
+
+                    await this.context.SaveChangesAsync();
+                    await this.context.DisposeAsync();
 
                     return result;
 
@@ -80,22 +94,17 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                using (ApplicationContext context = new ApplicationContext())
-                {
-                    Patient patient = Patient.New();
-                    patient.Name.Use = this.Use;
-                    patient.Name.Family = this.Family;
-                    patient.Name.Given.AddRange(this.Given);
-                    patient.Gender = this.Gender;
-                    patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
-                    patient.Active = this.Active;
+                Patient patient = Patient.New();
+                patient.Name.Use = this.Use;
+                patient.Name.Family = this.Family;
+                patient.Name.Given.AddRange(this.Given);
+                patient.Gender = this.Gender;
+                patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
+                patient.Active = this.Active;
 
-                    await context.AddAsync(patient);
+                await this.context.AddAsync(patient);
 
-                    await context.SaveChangesAsync();
-
-                    return Result.New(patient, Result.Created);
-                }
+                return Result.New(patient, Result.Created);
             }
             #endregion
         }

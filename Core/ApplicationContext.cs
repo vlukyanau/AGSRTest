@@ -1,8 +1,10 @@
-﻿using Logic.Entities;
+﻿using System.Threading.Tasks;
+
+using Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace Logic
+namespace Core
 {
     public sealed class ApplicationContext : DbContext
     {

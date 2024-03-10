@@ -1,6 +1,6 @@
 ﻿using System;
 
-using Logic.Entities;
+using Core.Entities;
 
 
 namespace Api.Models

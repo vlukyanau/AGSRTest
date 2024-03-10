@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace Logic.Entities
+namespace Core.Entities
 {
     public sealed class Patient : IPatient
     {

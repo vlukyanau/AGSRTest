@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 
-namespace Logic.Entities
+namespace Core.Entities
 {
     public interface IHumanName : IEntity
     {

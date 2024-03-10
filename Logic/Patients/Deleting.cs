@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
-using Logic.Entities;
+using Core.Entities;
+using Core;
 
 
 namespace Logic.Patients
@@ -22,7 +23,12 @@ namespace Logic.Patients
             #region Constructor
             private Deleting()
             {
+                this.context = new ApplicationContext();
             }
+            #endregion
+
+            #region Fields
+            private readonly ApplicationContext context;
             #endregion
 
             #region Properties
@@ -35,6 +41,9 @@ namespace Logic.Patients
                 try
                 {
                     IResult result = await this.Process();
+
+                    await this.context.SaveChangesAsync();
+                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -50,16 +59,11 @@ namespace Logic.Patients
             #region Assistants
             private async Task<IResult> Process()
             {
-                using (ApplicationContext context = new ApplicationContext())
-                {
-                    Patient patient = await context.Patients.FirstOrDefaultAsync(item => item.Id == this.Id);
-                    if (patient == null)
-                        return Result.NotFound;
+                Patient patient = await this.context.Patients.FirstOrDefaultAsync(item => item.Id == this.Id);
+                if (patient == null)
+                    return Result.NotFound;
 
-                    context.Patients.Remove(patient);
-
-                    await context.SaveChangesAsync();
-                }
+                this.context.Patients.Remove(patient);
 
                 return Result.NoContent;
             }

@@ -5,7 +5,8 @@ using System.Collections.Generic;
 
 using Microsoft.EntityFrameworkCore;
 
-using Logic.Entities;
+using Core.Entities;
+using Core;
 
 
 namespace Logic.Patients
@@ -19,6 +20,17 @@ namespace Logic.Patients
             {
                 return new Updating();
             }
+            #endregion
+
+            #region Constructors
+            private Updating()
+            {
+                this.context = new ApplicationContext();
+            }
+            #endregion
+
+            #region Fields
+            private readonly ApplicationContext context;
             #endregion
 
             #region Properties
@@ -40,6 +52,9 @@ namespace Logic.Patients
                         return Result.BadRequest;
 
                     IResult result = await this.Process();
+
+                    await this.context.SaveChangesAsync();
+                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -81,23 +96,18 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                using (ApplicationContext context = new ApplicationContext())
-                {
-                    Patient patient = await context.Patients.Include(item => item.Name).SingleAsync(item => item.Id == this.Id);
-                    if (patient == null)
-                        return Result.BadRequest;
+                Patient patient = await this.context.Patients.Include(item => item.Name).FirstOrDefaultAsync(item => item.Id == this.Id);
+                if (patient == null)
+                    return Result.BadRequest;
 
-                    patient.Name.Use = this.Use;
-                    patient.Name.Family = this.Family;
-                    patient.Name.Given = this.Given;
-                    patient.Gender = this.Gender;
-                    patient.BirthDate = (DateTime)this.BirthDate;
-                    patient.Active = this.Active;
+                patient.Name.Use = this.Use;
+                patient.Name.Family = this.Family;
+                patient.Name.Given = this.Given;
+                patient.Gender = this.Gender;
+                patient.BirthDate = (DateTime)this.BirthDate;
+                patient.Active = this.Active;
 
-                    context.Update(patient);
-
-                    await context.SaveChangesAsync();
-                }
+                this.context.Update(patient);
 
                 return Result.NoContent;
             }

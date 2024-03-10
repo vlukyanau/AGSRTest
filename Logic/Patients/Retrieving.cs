@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
-using Logic.Entities;
+using Core.Entities;
+using Core.Repository;
+using Core;
 
 
 namespace Logic.Patients
@@ -23,8 +25,8 @@ namespace Logic.Patients
                 lt,       // LessThan
                 ge,       // GreaterthanOrEquals
                 le,       // LessThanOrEquals
-                sa,       // StartsAfter
-                eb,       // EndsBefore
+                sa,       // StartAfter
+                eb,       // EndBefore
                 ap        // Approximate
             }
             #endregion
@@ -69,12 +71,25 @@ namespace Logic.Patients
             }
             #endregion
 
+            #region Constructors
+            private Retrieving()
+            {
+                this.context = new ApplicationContext();
+            }
+            #endregion
+
+            #region Fields
+            private readonly ApplicationContext context;
+            #endregion
+
             #region Methods
             public async Task<IResult> Go()
             {
                 try
                 {
                     IResult result = await this.Process();
+
+                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -91,11 +106,15 @@ namespace Logic.Patients
                 {
                     IResult result = await this.Process(id);
 
+                    await this.context.DisposeAsync();
+
                     return result;
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
+
+                    await this.context.DisposeAsync();
 
                     return Result.BadRequest;
                 }
@@ -105,6 +124,8 @@ namespace Logic.Patients
                 try
                 {
                     IResult result = await this.Process(dates);
+
+                    await this.context.DisposeAsync();
 
                     return result;
                 }
@@ -120,44 +141,40 @@ namespace Logic.Patients
             #region Assistants
             private async Task<IResult> Process()
             {
-                using (ApplicationContext context = new ApplicationContext())
-                {
-                    IReadOnlyList<Patient> patients = await context.Patients.Include(patient => patient.Name).ToListAsync();
+                IReadOnlyList<Patient> patients = await this.GetPatients().ToListAsync();
 
-                    return Result.New(patients);
-                }
+                return Result.New(patients);
             }
             private async Task<IResult> Process(Guid id)
             {
-                using (ApplicationContext context = new ApplicationContext())
-                {
-                    Patient patient = await context.Patients.Include(patient => patient.Name).SingleAsync(item => item.Id == id);
-                    if (patient == null)
-                        return Result.NotFound;
+                Patient patient = await this.GetPatients().FirstOrDefaultAsync(item => item.Id == id);
+                if (patient == null)
+                    return Result.NotFound;
 
-                    return Result.New(patient);
-                }
+                return Result.New(patient);
             }
             private async Task<IResult> Process(IReadOnlyList<string> dates)
             {
                 if (dates.Count == 0 || dates.Count > 2)
                     return Result.BadRequest;
 
-                using (ApplicationContext context = new ApplicationContext())
+                IQueryable<Patient> query = this.GetPatients();
+
+                foreach (string date in dates)
                 {
-                    IQueryable<Patient> query = context.Patients.Include(patient => patient.Name);
-
-                    foreach (string date in dates)
-                    {
-                        query = this.FilterDate(query, date);
-                        if (query == null)
-                            return Result.BadRequest;
-                    }
-
-                    IReadOnlyList<Patient> patients = await query.ToListAsync();
-
-                    return Result.New(patients);
+                    query = this.FilterDate(query, date);
+                    if (query == null)
+                        return Result.BadRequest;
                 }
+
+                IReadOnlyList<Patient> patients = await query.ToListAsync();
+
+                return Result.New(patients);
+            }
+
+            private IQueryable<Patient> GetPatients()
+            {
+                return this.context.Patients.Include(patient => patient.Name);
             }
 
             private IQueryable<Patient> FilterDate(IQueryable<Patient> query, string date)
@@ -192,14 +209,15 @@ namespace Logic.Patients
                         query = query.Where(patient => patient.BirthDate <= tuple.Date);
                         break;
 
+                    // TODO: Implement
                     case Prefix.sa:
-                        break;
+                        return null;
 
                     case Prefix.eb:
-                        break;
+                        return null;
 
                     case Prefix.ap:
-                        break;
+                        return null;
 
                     default:
                         return null;

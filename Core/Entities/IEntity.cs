@@ -1,4 +1,4 @@
-﻿namespace Logic.Entities
+﻿namespace Core.Entities
 {
     public interface IEntity
     {
