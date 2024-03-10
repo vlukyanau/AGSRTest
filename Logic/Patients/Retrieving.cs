@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -148,19 +147,9 @@ namespace Logic.Patients
                 {
                     IQueryable<Patient> query = context.Patients.Include(patient => patient.Name);
 
-                    if (dates.Count == 1)
-                        query = this.FilterDate(query, dates[0]);
-
-                    if (query == null)
-                        return Result.BadRequest;
-
-                    if (dates.Count == 2)
+                    foreach (string date in dates)
                     {
-                        query = this.FilterDate(query, dates[0]);
-                        if (query == null)
-                            return Result.BadRequest;
-
-                        query = this.FilterDate(query, dates[1]);
+                        query = this.FilterDate(query, date);
                         if (query == null)
                             return Result.BadRequest;
                     }
