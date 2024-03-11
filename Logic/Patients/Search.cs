@@ -44,15 +44,15 @@ namespace Logic.Patients
             private class Loading : ILoading
             {
                 #region Constructors
-                public Loading(IWork work, IReadOnlyList<Tuple> dates)
+                public Loading(IWorker work, IReadOnlyList<Tuple> dates)
                 {
-                    this.Work = work;
+                    this.Worker = work;
                     this.Dates = dates;
                 }
                 #endregion
 
                 #region Properties
-                private IWork Work { get; }
+                private IWorker Worker { get; }
                 private IReadOnlyList<Tuple> Dates { get; }
 
                 private IReadOnlyDictionary<Guid, Patient> Patients { get; set; }
@@ -75,7 +75,7 @@ namespace Logic.Patients
                 {
                     if (this.Patients == null)
                     {
-                        IQueryable<Patient> patients = this.Work.Patients.GetAll();
+                        IQueryable<Patient> patients = this.Worker.Patients.GetAll();
 
                         foreach (Tuple tuple in this.Dates)
                         {
@@ -96,7 +96,7 @@ namespace Logic.Patients
 
                         IReadOnlyList<Guid> ids = patients.Values.Ids(item => item.HumanNameId);
 
-                        IQueryable<HumanName> humanNames = this.Work.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
+                        IQueryable<HumanName> humanNames = this.Worker.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
 
                         this.HumanNames = await humanNames.ToDictionaryAsync(item => item.Id);
                     }
@@ -199,12 +199,12 @@ namespace Logic.Patients
             #region Constructors
             private Search()
             {
-                this.work = Work.New();
+                this.worker = Worker.New();
             }
             #endregion
 
             #region Fields
-            private readonly IWork work;
+            private readonly IWorker worker;
             #endregion
 
             #region Properties
@@ -273,7 +273,7 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                ILoading loading = new Loading(this.work, this.Dates);
+                ILoading loading = new Loading(this.worker, this.Dates);
 
                 IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients(); //this.GetPatients();
 

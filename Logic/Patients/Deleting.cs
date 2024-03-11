@@ -21,12 +21,12 @@ namespace Logic.Patients
             #region Constructor
             private Deleting()
             {
-                this.work = Work.New();
+                this.worker = Worker.New();
             }
             #endregion
 
             #region Fields
-            private readonly IWork work;
+            private readonly IWorker worker;
             #endregion
 
             #region Properties
@@ -54,18 +54,18 @@ namespace Logic.Patients
             #region Assistants
             private async Task<IResult> Process()
             {
-                Patient patient = await this.work.Patients.GetId(this.Id);
+                Patient patient = await this.worker.Patients.GetId(this.Id);
                 if (patient == null)
                     return Result.NotFound;
 
-                HumanName humanName = await this.work.HumanNames.GetId(patient.HumanNameId);
+                HumanName humanName = await this.worker.HumanNames.GetId(patient.HumanNameId);
                 if (humanName == null)
                     return Result.NotFound;
 
-                this.work.HumanNames.Delete(humanName);
-                this.work.Patients.Delete(patient);
+                this.worker.HumanNames.Delete(humanName);
+                this.worker.Patients.Delete(patient);
 
-                this.work.Save();
+                this.worker.Save();
 
                 return Result.NoContent;
             }

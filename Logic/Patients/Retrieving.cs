@@ -30,14 +30,14 @@ namespace Logic.Patients
             private class Loading : ILoading
             {
                 #region Constructors
-                public Loading(IWork work)
+                public Loading(IWorker work)
                 {
-                    this.Work = work;
+                    this.Worker = work;
                 }
                 #endregion
 
                 #region Properties
-                private IWork Work { get; }
+                private IWorker Worker { get; }
 
                 private IReadOnlyDictionary<Guid, Patient> Patients { get; set; }
                 private IReadOnlyDictionary<Guid, HumanName> HumanNames { get; set; }
@@ -63,7 +63,7 @@ namespace Logic.Patients
                 {
                     if (this.Patients == null)
                     {
-                        IQueryable<Patient> patients = this.Work.Patients.GetAll();
+                        IQueryable<Patient> patients = this.Worker.Patients.GetAll();
 
                         this.Patients = await patients.ToDictionaryAsync(item => item.Id);
                     }
@@ -85,7 +85,7 @@ namespace Logic.Patients
 
                         IReadOnlyList<Guid> ids = patients.Values.Ids(item => item.HumanNameId);
 
-                        IQueryable<HumanName> humanNames = this.Work.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
+                        IQueryable<HumanName> humanNames = this.Worker.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
 
                         this.HumanNames = await humanNames.ToDictionaryAsync(item => item.Id);
                     }
@@ -112,12 +112,12 @@ namespace Logic.Patients
             #region Constructors
             private Retrieving()
             {
-                this.work = Work.New();
+                this.worker = Worker.New();
             }
             #endregion
 
             #region Fields
-            private readonly IWork work;
+            private readonly IWorker worker;
             #endregion
 
             #region Methods
@@ -156,7 +156,7 @@ namespace Logic.Patients
             #region Assistants
             private async Task<IResult> Process()
             {
-                ILoading loading = new Loading(this.work);
+                ILoading loading = new Loading(this.worker);
 
                 IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients();
 
@@ -177,7 +177,7 @@ namespace Logic.Patients
             }
             private async Task<IResult> Process(Guid id)
             {
-                ILoading loading = new Loading(this.work);
+                ILoading loading = new Loading(this.worker);
 
                 Patient patient = await loading.GetPatient(id);
                 if (patient == null)

@@ -5,7 +5,7 @@ using Core.Repository;
 
 namespace Core
 {
-    public interface IWork
+    public interface IWorker
     {
         IPatientsRepository Patients { get; }
         IHumanNamesRepository HumanNames { get; }
@@ -13,17 +13,17 @@ namespace Core
         int Save();
     }
 
-    public class Work : IWork, IDisposable
+    public class Worker : IWorker, IDisposable
     {
         #region Static
-        public static IWork New()
+        public static IWorker New()
         {
-            return new Work();
+            return new Worker();
         }
         #endregion
 
         #region Constructors
-        private Work()
+        private Worker()
         {
             ApplicationContext context = new ApplicationContext();
 
@@ -44,7 +44,7 @@ namespace Core
         #endregion
 
         #region IWork
-        int IWork.Save()
+        int IWorker.Save()
         {
             return this.context.SaveChanges();
         }

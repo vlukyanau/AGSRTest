@@ -8,12 +8,13 @@ namespace Core.Repository
 {
     public interface IRepository<T> where T : class
     {
-        Task<T> GetId(Guid id);
         DbSet<T> GetAll();
+        Task<T> GetId(Guid id);
 
         Task Add(T entity);
 
-        void Delete(T entity);
         void Update(T entity);
+
+        void Delete(T entity);
     }
 }

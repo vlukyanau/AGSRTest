@@ -8,7 +8,7 @@ namespace Core.Entities
     {
     }
 
-    public interface Entity : IEntity
+    public class Entity : IEntity
     {
     }
 

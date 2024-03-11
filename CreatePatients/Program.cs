@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
+
 namespace CreatePatients
 {
     internal class Program
@@ -48,7 +49,7 @@ namespace CreatePatients
         #endregion
 
         #region Assistents
-        private static void Main(string[] args)
+        private static void Main()
         {
             Program.Run().GetAwaiter().GetResult();
         }

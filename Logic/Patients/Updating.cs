@@ -23,12 +23,12 @@ namespace Logic.Patients
             #region Constructors
             private Updating()
             {
-                this.work = Work.New();
+                this.worker = Worker.New();
             }
             #endregion
 
             #region Fields
-            private readonly IWork work;
+            private readonly IWorker worker;
             #endregion
 
             #region Properties
@@ -91,11 +91,11 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                Patient patient = await this.work.Patients.GetId((Guid)this.Id);
+                Patient patient = await this.worker.Patients.GetId((Guid)this.Id);
                 if (patient == null)
                     return Result.BadRequest;
 
-                HumanName humanName = await this.work.HumanNames.GetId(patient.HumanNameId);
+                HumanName humanName = await this.worker.HumanNames.GetId(patient.HumanNameId);
                 if (humanName == null)
                     return Result.BadRequest;
 
@@ -107,10 +107,10 @@ namespace Logic.Patients
                 humanName.Family = this.Family;
                 humanName.Given = this.Given;
 
-                this.work.HumanNames.Update(humanName);
-                this.work.Patients.Update(patient);
+                this.worker.HumanNames.Update(humanName);
+                this.worker.Patients.Update(patient);
 
-                this.work.Save();
+                this.worker.Save();
 
                 return Result.NoContent;
             }

@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-
-using Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal;
 
 using Core.Entities;
-using System.Text;
+
+using Microsoft.Extensions.Configuration;
 
 
 namespace Core
@@ -15,11 +13,11 @@ namespace Core
         public DbSet<Patient> Patients { get; set; } = null!;
         public DbSet<HumanName> HumanNames { get; set; } = null!;
         #endregion
-
+        
         #region Constructors
         public ApplicationContext()
         {
-            this.Database.EnsureCreated();
+            this.Database.EnsureCreated();  
         }
         #endregion
 

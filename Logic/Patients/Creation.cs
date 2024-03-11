@@ -25,12 +25,12 @@ namespace Logic.Patients
             #region Constructors
             private Creation()
             {
-                this.work = Work.New();
+                this.worker = Worker.New();
             }
             #endregion
 
             #region Fields
-            private readonly IWork work;
+            private readonly IWorker worker;
             #endregion
 
             #region Properties
@@ -104,10 +104,10 @@ namespace Logic.Patients
                 patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
                 patient.Active = this.Active;
 
-                await this.work.HumanNames.Add(humanName);
-                await this.work.Patients.Add(patient);
+                await this.worker.HumanNames.Add(humanName);
+                await this.worker.Patients.Add(patient);
 
-                this.work.Save();
+                this.worker.Save();
 
                 PatientInfo info = PatientInfo.New(patient, humanName);
 

@@ -7,7 +7,7 @@ using Core.Entities;
 namespace Logic.Models
 {
     /// <summary>
-    /// Information about an individual or animal receiving health care services
+    /// Information about an individual receiving health care services
     /// </summary>
     public sealed class PatientInfo : IPatientInfo
     {
