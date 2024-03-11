@@ -1,6 +1,6 @@
 # AGSRTest
 
-**Вакансия:** 
+**Вакансия:** https://rabota.by/vacancy/94143372
 
 **Резюме HH:** https://rabota.by/applicant/resumes/view?resume=2a6e5e68ff0cc53ca20039ed1f556a55505253
 
