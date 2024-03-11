@@ -6,6 +6,117 @@
 	},
 	"item": [
 		{
+			"name": "Search",
+			"item": [
+				{
+					"name": "Search by birthdate(1)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\r",
+									"    \"Status response code should be 200\",\r",
+									"    function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    }\r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{patch}}/patients/birthdate?date=ge2024-01&date=le2024-12",
+							"host": [
+								"{{patch}}"
+							],
+							"path": [
+								"patients",
+								"birthdate"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "ge2024-01"
+								},
+								{
+									"key": "date",
+									"value": "le2024-12"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search by birthdate(2)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"\r",
+									"pm.test(\r",
+									"    \"Status response code should be 200\",\r",
+									"    function () {\r",
+									"        pm.response.to.have.status(200);\r",
+									"    }\r",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{patch}}/patients/birthdate?date=ge2024-01",
+							"host": [
+								"{{patch}}"
+							],
+							"path": [
+								"patients",
+								"birthdate"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "ge2024-01"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Create Patient",
 			"event": [
 				{
@@ -13,7 +124,35 @@
 					"script": {
 						"exec": [
 							"const jsonData = pm.response.json()\r",
-							"pm.collectionVariables.set(\"id\", jsonData.id)"
+							"pm.collectionVariables.set(\"id\", jsonData.id)\r",
+							"\r",
+							"pm.test(\r",
+							"    \"Status response code should be 201\",\r",
+							"    function () {\r",
+							"        pm.response.to.have.status(201);\r",
+							"    }\r",
+							");\r",
+							"\r",
+							"pm.test(\"Name is use\", function () {\r",
+							"    pm.expect(jsonData.name.use).to.eql(\"official\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is family\", function () {\r",
+							"    pm.expect(jsonData.name.family).to.eql(\"Иванов\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is gender\", function () {\r",
+							"    pm.expect(jsonData.gender).to.eql(\"Female\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is birthDate\", function () {\r",
+							"    pm.expect(jsonData.birthDate).to.eql(\"2024-03-09T17:59:51Z\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is active\", function () {\r",
+							"    pm.expect(jsonData.active).to.eql(true);\r",
+							"});\r",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -24,7 +163,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n   \"name\": {\r\n     \"use\": \"official\",\r\n     \"family\": \"Иванов\",\r\n     \"given\": [\r\n       \"Иван\",\r\n       \"Иванович\"\r\n     ]\r\n   },\r\n   \"gender\": 1,\r\n   \"birthDate\": \"2024-03-09T20:35:14.335Z\",\r\n   \"active\": true\r\n}",
+					"raw": "{\r\n   \"name\": {\r\n     \"use\": \"official\",\r\n     \"family\": \"Иванов\",\r\n     \"given\": [\r\n       \"Иван\",\r\n       \"Иванович\"\r\n     ]\r\n   },\r\n   \"gender\": 1,\r\n   \"birthDate\": \"2024-03-09T17:59:51\",\r\n   \"active\": true\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -54,6 +193,20 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\r",
+							"    \"Status response code should be 204\",\r",
+							"    function () {\r",
+							"        pm.response.to.have.status(204);\r",
+							"    }\r",
+							");"
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -61,7 +214,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"id\": \"{{id}}\",\r\n    \"name\": {\r\n        \"id\": \"1f82f4fe-794d-4289-8059-4c7f8493e3c6\",\r\n        \"use\": \"official\",\r\n        \"family\": \"Иванов2\",\r\n        \"given\": [\r\n            \"Иван2\",\r\n            \"Иванович2\"\r\n        ]\r\n    },\r\n    \"gender\": 1,\r\n    \"birthDate\": \"2024-03-09T20:35:14.335Z\",\r\n    \"active\": true\r\n}",
+					"raw": "{\r\n    \"id\": \"{{id}}\",\r\n    \"name\": {\r\n        \"use\": \"official2\",\r\n        \"family\": \"Иванов2\",\r\n        \"given\": [\r\n            \"Иван2\",\r\n            \"Иванович2\"\r\n        ]\r\n    },\r\n    \"gender\": 0,\r\n    \"birthDate\": \"2024-03-09T20:35:14.335Z\",\r\n    \"active\": false\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -91,6 +244,43 @@
 						],
 						"type": "text/javascript"
 					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json()\r",
+							"\r",
+							"pm.test(\r",
+							"    \"Status response code should be 200\",\r",
+							"    function () {\r",
+							"        pm.response.to.have.status(200);\r",
+							"    }\r",
+							");\r",
+							"\r",
+							"pm.test(\"Name is use\", function () {\r",
+							"    pm.expect(jsonData.name.use).to.eql(\"official2\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is family\", function () {\r",
+							"    pm.expect(jsonData.name.family).to.eql(\"Иванов2\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is gender\", function () {\r",
+							"    pm.expect(jsonData.gender).to.eql(\"Male\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is birthDate\", function () {\r",
+							"    pm.expect(jsonData.birthDate).to.eql(\"2024-03-09T20:35:14.335Z\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Name is active\", function () {\r",
+							"    pm.expect(jsonData.active).to.eql(false);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
 				}
 			],
 			"request": {
@@ -111,6 +301,22 @@
 		},
 		{
 			"name": "Delete Patient",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\r",
+							"    \"Status response code should be 204\",\r",
+							"    function () {\r",
+							"        pm.response.to.have.status(204);\r",
+							"    }\r",
+							");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -155,7 +361,7 @@
 		},
 		{
 			"key": "patch",
-			"value": "https://localhost:7141/api",
+			"value": "http://localhost:8080/api",
 			"type": "default"
 		}
 	]
