@@ -52,7 +52,7 @@ namespace Api.Controllers
         /// <summary>
         /// Search 'Patient' by 'Date' parameter.
         /// </summary>
-        /// <param name="dates"></param>
+        /// <param name="date"></param>
         /// <remarks>
         /// **More information:** [hl7 Search](https://www.hl7.org/fhir/search.html#date)
         /// </remarks>
@@ -60,11 +60,11 @@ namespace Api.Controllers
         /// <response code="200"></response>
         /// <response code="400">Invalid parameters</response>
         [HttpGet("birthdate")]
-        public async Task<IActionResult> Search([FromQuery] string[] dates)
+        public async Task<IActionResult> Search([FromQuery] string[] date)
         {
-            Patients.Search search = Patients.Search.New();
+            Patients.Searching search = Patients.Searching.New();
 
-            IResult addResult = search.AddRange(dates);
+            IResult addResult = search.AddRange(date);
             if (addResult == Result.BadRequest)
                 return new OutputResult(addResult);
 

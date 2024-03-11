@@ -15,7 +15,7 @@ namespace Logic.Patients
 {
     public static partial class Patients
     {
-        public sealed class Search
+        public sealed class Searching
         {
             #region Enums
             private enum Prefix
@@ -75,15 +75,17 @@ namespace Logic.Patients
                 {
                     if (this.Patients == null)
                     {
-                        IQueryable<Patient> patients = this.Worker.Patients.GetAll();
+                        IQueryable<Patient> query = this.Worker.Patients.GetAll();
 
                         foreach (Tuple tuple in this.Dates)
                         {
-                            this.FilterDate(patients, tuple);
+                            query = this.FilterDate(query, tuple);
                         }
-
-                        this.Patients = await patients.ToDictionaryAsync(item => item.Id);
+                        
+                        this.Patients = query.ToDictionary(item => item.Id);
                     }
+
+                    await Task.CompletedTask;
 
                     return this.Patients;
                 }
@@ -190,14 +192,14 @@ namespace Logic.Patients
             #endregion
 
             #region Static
-            public static Search New()
+            public static Searching New()
             {
-                return new Search();
+                return new Searching();
             }
             #endregion
 
             #region Constructors
-            private Search()
+            private Searching()
             {
                 this.worker = Worker.New();
             }
@@ -281,7 +283,7 @@ namespace Logic.Patients
 
                 foreach ((_, Patient patient) in patients)
                 {
-                    HumanName humanName = await loading.GetHumanName(patient.Id);
+                    HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
                     if (humanName == null)
                         return Result.BadRequest;
 
