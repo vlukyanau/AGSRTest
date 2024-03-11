@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore;
 
 using Core;
 using Core.Entities;
@@ -17,6 +16,10 @@ namespace Logic.Patients
     {
         public sealed class Searching
         {
+            #region Constants
+            private const string Format = @"(eq|ne|gt|lt|ge|le|sa|eb|ap)?([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1])(T([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\.[0-9]{1,9})?)?)?(Z|(\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00)?)?)?";
+            #endregion
+
             #region Enums
             private enum Prefix
             {
@@ -85,7 +88,7 @@ namespace Logic.Patients
                             patients = patients.Where(item => period.Contains(item.BirthDate)).ToList();
                         }
 
-                        this.Patients = query.ToDictionary(item => item.Id);
+                        this.Patients = patients.ToDictionary(item => item.Id);
                     }
 
                     return this.Patients;
@@ -130,14 +133,16 @@ namespace Logic.Patients
                 }
                 public Period(string date)
                 {
-                    if (Enum.TryParse(date[..2], true, out Prefix prefix) == false)
-                    {
-                        this.SetPeriod(date, Prefix.eq);
-                    }
-                    else
-                    {
+                    Regex regex = new Regex(Searching.Format);
+                    if (regex.IsMatch(date) == false)
+                        throw new ArgumentException("Parametr DateTime not valid.");
+
+                    Prefix prefix = (Prefix)Enum.Parse(typeof(Prefix), date[..2], true);
+
+                    if (Enum.IsDefined(typeof(Prefix), prefix) == true)
                         this.SetPeriod(date[2..], prefix);
-                    }
+                    else
+                        this.SetPeriod(date, Prefix.eq);
                 }
                 #endregion
 
@@ -153,26 +158,22 @@ namespace Logic.Patients
                     switch (this.Prefix)
                     {
                         case Prefix.eq:
-                            if (date == this.From && date == this.Till)
-                                return true;
-                            break;
+                            return date >= this.From && date <= this.Till;
 
                         case Prefix.ne:
-                            if (date != this.From && date != this.Till)
-                                return true;
-                            break;
+                            return date < this.From || date > this.Till;
 
                         case Prefix.gt:
+                            return date > this.From;
+
                         case Prefix.lt:
-                            if (date > this.From && date < this.Till)
-                                return true;
-                            break;
+                            return date < this.Till;
 
                         case Prefix.ge:
+                            return date >= this.From;
+
                         case Prefix.le:
-                            if (date >= this.From && date <= this.Till)
-                                return true;
-                            break;
+                            return date <= this.Till;
 
                         // TODO: Implement
                         case Prefix.sa:
@@ -187,59 +188,75 @@ namespace Logic.Patients
                         default:
                             throw new ArgumentOutOfRangeException(nameof(this.Prefix));
                     }
-
-                    return false;
                 }
 
                 private void SetPeriod(string date, Prefix prefix)
                 {
-                    DateTime from = DateTime.MinValue;
-                    DateTime till = DateTime.MaxValue;
-
                     if (date.Length == 4)
                     {
                         int year = int.Parse(date);
 
-                        from = new DateTime(year, 01, 01, 00, 00, 00);
-                        till = new DateTime(year, 12, 31, 23, 59, 59);
+                        this.From = new DateTime(year, 01, 01, 0, 0, 0, 0);
+                        this.Till = this.From.AddYears(1).AddTicks(-1);
+                        this.Prefix = prefix;
+
+                        return;
                     }
-                    else
+
+                    if (date.Length == 7)
                     {
-                        if (DateTime.TryParse(date, out DateTime result) == false)
-                            return; // TODO: EXEPTION NOT VALID
+                        this.From = DateTime.Parse(date);
+                        this.Till = this.From.AddMonths(1).AddTicks(-1);
+                        this.Prefix = prefix;
 
-                        switch (prefix)
-                        {
-                            case Prefix.eq:
-                            case Prefix.ne:
-                                from = result;
-                                till = result;
-                                break;
+                        return;
+                    }
 
-                            case Prefix.gt:
-                            case Prefix.ge:
-                                from = result;
-                                break;
+                    if (date.Length == 10)
+                    {
+                        this.From = DateTime.Parse(date);
+                        this.Till = this.From.AddDays(1d).AddTicks(-1);
+                        this.Prefix = prefix;
 
-                            case Prefix.lt:
-                            case Prefix.le:
-                                till = result;
-                                break;
+                        return;
+                    }
 
-                            // TODO: Implement
-                            case Prefix.sa:
-                                return;
+                    DateTime from = DateTime.MinValue;
+                    DateTime till = DateTime.MaxValue;
 
-                            case Prefix.eb:
-                                return;
+                    if (DateTime.TryParse(date, out DateTime result) == false)
+                        return; // TODO: EXEPTION NOT VALID
 
-                            case Prefix.ap:
-                                return;
+                    switch (prefix)
+                    {
+                        case Prefix.eq:
+                        case Prefix.ne:
+                            from = result;
+                            till = result;
+                            break;
 
-                            default:
-                                return;
-                        }
+                        case Prefix.gt:
+                        case Prefix.ge:
+                            from = result;
+                            break;
 
+                        case Prefix.lt:
+                        case Prefix.le:
+                            till = result;
+                            break;
+
+                        // TODO: Implement
+                        case Prefix.sa:
+                            return;
+
+                        case Prefix.eb:
+                            return;
+
+                        case Prefix.ap:
+                            return;
+
+                        default:
+                            return;
                     }
 
                     this.From = from.ToUniversalTime();
@@ -323,7 +340,7 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (this.Periods.Any() == false)
+                if (this.Periods.Count == 0)
                     return false;
 
                 return true;
@@ -333,7 +350,7 @@ namespace Logic.Patients
             {
                 ILoading loading = new Loading(this.worker, this.Periods);
 
-                IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients(); //this.GetPatients();
+                IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients();
 
                 List<PatientInfo> infos = new List<PatientInfo>();
 

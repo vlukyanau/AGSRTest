@@ -6,113 +6,1166 @@
 	},
 	"item": [
 		{
-			"name": "Search",
+			"name": "Search by birthdate",
 			"item": [
 				{
-					"name": "Search by birthdate(1)",
-					"event": [
+					"name": "Valid (not prefix)",
+					"item": [
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
+							"name": "Create Patient",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"pm.collectionVariables.set(\"id\", jsonData.id)\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 201\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(201);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(jsonData.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(jsonData.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(jsonData.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(jsonData.birthDate).to.eql(\"2024-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(jsonData.active).to.eql(true);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"name\": {\r\n     \"use\": \"official\",\r\n     \"family\": \"Postman Test\",\r\n     \"given\": [\r\n       \"Иван\",\r\n       \"Иванович\"\r\n     ]\r\n   },\r\n   \"gender\": 1,\r\n   \"birthDate\": \"2024-01-12T22:32:12.123456+03:00\",\r\n   \"active\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{patch}}/patients",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients"
+									]
+								}
+							},
+							"response": []
 						},
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const jsonData = pm.response.json()\r",
-									"\r",
-									"pm.test(\r",
-									"    \"Status response code should be 200\",\r",
-									"    function () {\r",
-									"        pm.response.to.have.status(200);\r",
-									"    }\r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{patch}}/patients/birthdate?date=ge2024-01&date=le2024-12",
-							"host": [
-								"{{patch}}"
-							],
-							"path": [
-								"patients",
-								"birthdate"
-							],
-							"query": [
+							"name": "yyyy",
+							"event": [
 								{
-									"key": "date",
-									"value": "ge2024-01"
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
 								},
 								{
-									"key": "date",
-									"value": "le2024-12"
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"var data=null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2024-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Search by birthdate(2)",
-					"event": [
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": []
+								},
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024"
+										}
+									]
+								}
+							},
+							"response": []
 						},
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const jsonData = pm.response.json()\r",
-									"\r",
-									"pm.test(\r",
-									"    \"Status response code should be 200\",\r",
-									"    function () {\r",
-									"        pm.response.to.have.status(200);\r",
-									"    }\r",
-									");"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{patch}}/patients/birthdate?date=ge2024-01",
-							"host": [
-								"{{patch}}"
-							],
-							"path": [
-								"patients",
-								"birthdate"
-							],
-							"query": [
+							"name": "yyyy-mm",
+							"event": [
 								{
-									"key": "date",
-									"value": "ge2024-01"
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"var data=null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2024-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
 								}
-							]
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024-01",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024-01"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "yyyy-mm-dd",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2024-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024-01-12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024-01-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "yyyy-mm-ddThh:mm:ss",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data = null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data).to.eql(null);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024-01-12T22:32:12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024-01-12T22:32:12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "yyyy-mm-ddThh:mm:ss.ssssss",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data = null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data).to.eql(null);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024-01-12T22:32:12.123456789",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024-01-12T22:32:12.123456789"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "yyyy-mm-ddThh:mm:ss.ssssss+hh:mm",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data = null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data).to.eql(null);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=2024-01-12T22:32:12.123456789+03:12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "2024-01-12T22:32:12.123456789+03:12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Patient",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\r",
+											"    \"Status response code should be 204\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(204);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"pm.collectionVariables.set(\"id\", null)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/{{id}}",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "Valid (with prefix)",
+					"item": [
+						{
+							"name": "Create Patient",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"pm.collectionVariables.set(\"id\", jsonData.id)\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 201\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(201);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(jsonData.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(jsonData.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(jsonData.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(jsonData.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(jsonData.active).to.eql(true);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"name\": {\r\n     \"use\": \"official\",\r\n     \"family\": \"Postman Test\",\r\n     \"given\": [\r\n       \"Иван\",\r\n       \"Иванович\"\r\n     ]\r\n   },\r\n   \"gender\": 1,\r\n   \"birthDate\": \"2020-01-12T22:32:12.123456+03:00\",\r\n   \"active\": true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{patch}}/patients",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "geyyyy",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data = null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data).to.eql(null);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=eq2024",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "eq2024"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "neyyyy",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data = null;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=ne2024",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "ne2024"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "gtyyyy-mm-dd",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=gt2020-01-12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "gt2020-01-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ltyyyy-mm-dd",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=lt2024-01-12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "lt2024-01-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "geyyyy-mm-dd",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=ge2020-01-12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "ge2020-01-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "leyyyy-mm-dd",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json()\r",
+											"\r",
+											"pm.test(\r",
+											"    \"Status response code should be 200\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(200);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"\r",
+											"var data;\r",
+											"\r",
+											"for (var i=0; i < jsonData.length; i++)\r",
+											"{\r",
+											"    if (jsonData[i].id == pm.collectionVariables.get(\"id\")) {\r",
+											"        data = jsonData[i];\r",
+											"    }\r",
+											"}\r",
+											"\r",
+											"pm.test(\"Id\", function () {\r",
+											"    pm.expect(data.id).to.eql(pm.collectionVariables.get(\"id\"));\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is use\", function () {\r",
+											"    pm.expect(data.name.use).to.eql(\"official\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is family\", function () {\r",
+											"    pm.expect(data.name.family).to.eql(\"Postman Test\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is gender\", function () {\r",
+											"    pm.expect(data.gender).to.eql(\"Female\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is birthDate\", function () {\r",
+											"    pm.expect(data.birthDate).to.eql(\"2020-01-12T19:32:12.123456Z\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Name is active\", function () {\r",
+											"    pm.expect(data.active).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/birthdate?date=le2024-01-12",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"birthdate"
+									],
+									"query": [
+										{
+											"key": "date",
+											"value": "le2024-01-12"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Patient",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\r",
+											"    \"Status response code should be 204\",\r",
+											"    function () {\r",
+											"        pm.response.to.have.status(204);\r",
+											"    }\r",
+											");\r",
+											"\r",
+											"pm.collectionVariables.set(\"id\", null)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{patch}}/patients/{{id}}",
+									"host": [
+										"{{patch}}"
+									],
+									"path": [
+										"patients",
+										"{{id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
@@ -311,7 +1364,9 @@
 							"    function () {\r",
 							"        pm.response.to.have.status(204);\r",
 							"    }\r",
-							");"
+							");\r",
+							"\r",
+							"pm.collectionVariables.set(\"id\", null)"
 						],
 						"type": "text/javascript"
 					}
@@ -363,6 +1418,10 @@
 			"key": "patch",
 			"value": "http://localhost:8080/api",
 			"type": "default"
+		},
+		{
+			"key": "patient",
+			"value": ""
 		}
 	]
 }

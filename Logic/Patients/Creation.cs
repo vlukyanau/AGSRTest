@@ -89,6 +89,9 @@ namespace Logic.Patients
                 if (this.BirthDate == null)
                     return false;
 
+                if (this.BirthDate.Value.ToUniversalTime() > DateTime.UtcNow)
+                    return false;
+
                 return true;
             }
 
@@ -101,7 +104,7 @@ namespace Logic.Patients
 
                 Patient patient = Patient.New(humanName.Id);
                 patient.Gender = this.Gender;
-                patient.BirthDate = ((DateTime)this.BirthDate).ToUniversalTime();
+                patient.BirthDate = this.BirthDate.Value.ToUniversalTime();
                 patient.Active = this.Active;
 
                 await this.worker.HumanNames.Add(humanName);
