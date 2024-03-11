@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Core.Repository
 {
     public interface IRepository<T> where T : class
     {
-        DbSet<T> GetAll();
+        Task<IReadOnlyList<T>> GetAll();
         Task<T> GetId(Guid id);
+
+        Task<IReadOnlyList<T>> Where(Expression<Func<T,bool>> predicate);
 
         Task Add(T entity);
 

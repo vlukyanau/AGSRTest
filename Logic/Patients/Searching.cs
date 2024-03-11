@@ -44,16 +44,16 @@ namespace Logic.Patients
             private class Loading : ILoading
             {
                 #region Constructors
-                public Loading(IWorker work, IReadOnlyList<Tuple> dates)
+                public Loading(IWorker work, IReadOnlyList<Period> periods)
                 {
                     this.Worker = work;
-                    this.Dates = dates;
+                    this.Periods = periods;
                 }
                 #endregion
 
                 #region Properties
                 private IWorker Worker { get; }
-                private IReadOnlyList<Tuple> Dates { get; }
+                private IReadOnlyList<Period> Periods { get; }
 
                 private IReadOnlyDictionary<Guid, Patient> Patients { get; set; }
                 private IReadOnlyDictionary<Guid, HumanName> HumanNames { get; set; }
@@ -75,17 +75,18 @@ namespace Logic.Patients
                 {
                     if (this.Patients == null)
                     {
-                        IQueryable<Patient> query = this.Worker.Patients.GetAll();
+                        // TODO: Can select directly from the database
+                        IReadOnlyList<Patient> query = await this.Worker.Patients.GetAll();
 
-                        foreach (Tuple tuple in this.Dates)
+                        List<Patient> patients = new List<Patient>(query);
+
+                        foreach (Period period in this.Periods)
                         {
-                            query = this.FilterDate(query, tuple);
+                            patients = patients.Where(item => period.Contains(item.BirthDate)).ToList();
                         }
-                        
+
                         this.Patients = query.ToDictionary(item => item.Id);
                     }
-
-                    await Task.CompletedTask;
 
                     return this.Patients;
                 }
@@ -98,9 +99,9 @@ namespace Logic.Patients
 
                         IReadOnlyList<Guid> ids = patients.Values.Ids(item => item.HumanNameId);
 
-                        IQueryable<HumanName> humanNames = this.Worker.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
+                        IReadOnlyList<HumanName> humanNames = await this.Worker.HumanNames.Where(item => ids.Contains(item.Id));
 
-                        this.HumanNames = await humanNames.ToDictionaryAsync(item => item.Id);
+                        this.HumanNames = humanNames.ToDictionary(item => item.Id);
                     }
 
                     return this.HumanNames;
@@ -111,82 +112,147 @@ namespace Logic.Patients
 
                     return humanNames.GetValueOrDefault(id);
                 }
-
-                private IQueryable<Patient> FilterDate(IQueryable<Patient> query, Tuple tuple)
-                {
-                    switch (tuple.Prefix)
-                    {
-                        case Prefix.eq:
-                            query = query.Where(patient => patient.BirthDate == tuple.Date);
-                            break;
-
-                        case Prefix.ne:
-                            query = query.Where(patient => patient.BirthDate != tuple.Date);
-                            break;
-
-                        case Prefix.gt:
-                            query = query.Where(patient => patient.BirthDate > tuple.Date);
-                            break;
-
-                        case Prefix.lt:
-                            query = query.Where(patient => patient.BirthDate < tuple.Date);
-                            break;
-
-                        case Prefix.ge:
-                            query = query.Where(patient => patient.BirthDate >= tuple.Date);
-                            break;
-
-                        case Prefix.le:
-                            query = query.Where(patient => patient.BirthDate <= tuple.Date);
-                            break;
-
-                        // TODO: Implement
-                        case Prefix.sa:
-                            return null;
-
-                        case Prefix.eb:
-                            return null;
-
-                        case Prefix.ap:
-                            return null;
-
-                        default:
-                            return null;
-                    }
-
-                    return query;
-                }
                 #endregion
             }
 
-            private class Tuple
+            private class Period
             {
-                #region Static
-                public static Tuple New(string date)
+                #region Constructors
+                private Period()
+                {
+                }
+
+                public Period(DateTime from, DateTime till, Prefix prefix)
+                {
+                    this.From = from;
+                    this.Till = till;
+                    this.Prefix = prefix;
+                }
+                public Period(string date)
                 {
                     if (Enum.TryParse(date[..2], true, out Prefix prefix) == false)
-                        return null;
-
-                    if (DateTime.TryParse(date[2..], out DateTime result) == false)
-                        return null;
-
-                    Tuple tuple = new Tuple();
-                    tuple.Date = result.ToUniversalTime();
-                    tuple.Prefix = prefix;
-
-                    return tuple;
-                }
-                #endregion
-
-                #region Constructors
-                private Tuple()
-                {
+                    {
+                        this.SetPeriod(date, Prefix.eq);
+                    }
+                    else
+                    {
+                        this.SetPeriod(date[2..], prefix);
+                    }
                 }
                 #endregion
 
                 #region Properties
-                public DateTime Date { get; private set; }
+                public DateTime From { get; private set; }
+                public DateTime Till { get; private set; }
                 public Prefix Prefix { get; private set; }
+                #endregion
+
+                #region Methods
+                public bool Contains(DateTime date)
+                {
+                    switch (this.Prefix)
+                    {
+                        case Prefix.eq:
+                            if (date == this.From && date == this.Till)
+                                return true;
+                            break;
+
+                        case Prefix.ne:
+                            if (date != this.From && date != this.Till)
+                                return true;
+                            break;
+
+                        case Prefix.gt:
+                        case Prefix.lt:
+                            if (date > this.From && date < this.Till)
+                                return true;
+                            break;
+
+                        case Prefix.ge:
+                        case Prefix.le:
+                            if (date >= this.From && date <= this.Till)
+                                return true;
+                            break;
+
+                        // TODO: Implement
+                        case Prefix.sa:
+                            return false;
+
+                        case Prefix.eb:
+                            return false;
+
+                        case Prefix.ap:
+                            return false;
+
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(this.Prefix));
+                    }
+
+                    return false;
+                }
+
+                private void SetPeriod(string date, Prefix prefix)
+                {
+                    DateTime from = DateTime.MinValue;
+                    DateTime till = DateTime.MaxValue;
+
+                    if (date.Length == 4)
+                    {
+                        int year = int.Parse(date);
+
+                        from = new DateTime(year, 01, 01, 00, 00, 00);
+                        till = new DateTime(year, 12, 31, 23, 59, 59);
+                    }
+                    else
+                    {
+                        if (DateTime.TryParse(date, out DateTime result) == false)
+                            return; // TODO: EXEPTION NOT VALID
+
+                        switch (prefix)
+                        {
+                            case Prefix.eq:
+                            case Prefix.ne:
+                                from = result;
+                                till = result;
+                                break;
+
+                            case Prefix.gt:
+                            case Prefix.ge:
+                                from = result;
+                                break;
+
+                            case Prefix.lt:
+                            case Prefix.le:
+                                till = result;
+                                break;
+
+                            // TODO: Implement
+                            case Prefix.sa:
+                                return;
+
+                            case Prefix.eb:
+                                return;
+
+                            case Prefix.ap:
+                                return;
+
+                            default:
+                                return;
+                        }
+
+                    }
+
+                    this.From = from.ToUniversalTime();
+                    this.Till = till.ToUniversalTime();
+                    this.Prefix = prefix;
+                }
+
+                public void Deconstruct(out DateTime from, out DateTime till, out Prefix prefix)
+                {
+                    from = this.From;
+                    till = this.Till;
+                    prefix = this.Prefix;
+                }
                 #endregion
             }
             #endregion
@@ -210,35 +276,25 @@ namespace Logic.Patients
             #endregion
 
             #region Properties
-            private List<Tuple> Dates { get; } = new List<Tuple>();
+            private List<Period> Periods { get; } = new List<Period>();
             #endregion
 
             #region Methods
             public IResult Add(string date)
             {
-                if (this.Dates.Count > 2)
-                    return Result.BadRequest;
+                Period period = new Period(date);
 
-                Tuple tuple = Tuple.New(date);
-                if (tuple == null)
-                    return Result.BadRequest;
-
-                this.Dates.Add(tuple);
+                this.Periods.Add(period);
 
                 return Result.Ok;
             }
             public IResult AddRange(IReadOnlyList<string> dates)
             {
-                if (dates.Count > 2)
-                    return Result.BadRequest;
-
                 foreach (string date in dates)
                 {
-                    Tuple tuple = Tuple.New(date);
-                    if (tuple == null)
-                        return Result.BadRequest;
+                    Period period = new Period(date);
 
-                    this.Dates.Add(tuple);
+                    this.Periods.Add(period);
                 }
 
                 return Result.Ok;
@@ -267,7 +323,7 @@ namespace Logic.Patients
             #region Assistants
             private bool Verify()
             {
-                if (this.Dates.Count == 0)
+                if (this.Periods.Any() == false)
                     return false;
 
                 return true;
@@ -275,7 +331,7 @@ namespace Logic.Patients
 
             private async Task<IResult> Process()
             {
-                ILoading loading = new Loading(this.worker, this.Dates);
+                ILoading loading = new Loading(this.worker, this.Periods);
 
                 IReadOnlyDictionary<Guid, Patient> patients = await loading.GetPatients(); //this.GetPatients();
 

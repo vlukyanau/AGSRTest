@@ -63,9 +63,9 @@ namespace Logic.Patients
                 {
                     if (this.Patients == null)
                     {
-                        IQueryable<Patient> patients = this.Worker.Patients.GetAll();
+                        IReadOnlyList<Patient> patients = await this.Worker.Patients.GetAll();
 
-                        this.Patients = await patients.ToDictionaryAsync(item => item.Id);
+                        this.Patients = patients.ToDictionary(item => item.Id);
                     }
 
                     return this.Patients;
@@ -85,9 +85,9 @@ namespace Logic.Patients
 
                         IReadOnlyList<Guid> ids = patients.Values.Ids(item => item.HumanNameId);
 
-                        IQueryable<HumanName> humanNames = this.Worker.HumanNames.GetAll().Where(item => ids.Contains(item.Id));
+                        IReadOnlyList<HumanName> humanNames = await this.Worker.HumanNames.Where(item => ids.Contains(item.Id));
 
-                        this.HumanNames = await humanNames.ToDictionaryAsync(item => item.Id);
+                        this.HumanNames = humanNames.ToDictionary(item => item.Id);
                     }
 
                     return this.HumanNames;

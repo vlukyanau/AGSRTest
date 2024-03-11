@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
@@ -20,20 +23,28 @@ namespace Core.Repository
         #endregion
 
         #region Methods
-        public DbSet<T> GetAll()
+        public async Task<IReadOnlyList<T>> GetAll()
         {
-            return this.context.Set<T>();
+            return await this.context.Set<T>().ToListAsync();
         }
         public async Task<T> GetId(Guid id)
         {
             return await this.context.Set<T>().FindAsync(id);
+        }
+        
+        public async Task<IReadOnlyList<T>> Where(Expression<Func<T, bool>> predicate)
+        {
+            await Task.CompletedTask;
+
+            return this.context.Set<T>().Where(predicate).ToList();
         }
 
         public async Task Add(T entity)
         {
             await this.context.Set<T>().AddAsync(entity);
         }
-        
+
+
         public void Update(T entity)
         {
             this.context.Set<T>().Update(entity);
