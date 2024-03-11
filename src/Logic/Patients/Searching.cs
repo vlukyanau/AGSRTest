@@ -123,15 +123,13 @@ namespace Logic.Patients
             #endregion
 
             #region Methods
-            public IResult Add(string date)
+            public void Add(string date)
             {
                 Period period = date.GetPeriod();
 
                 this.Periods.Add(period);
-
-                return Result.Ok;
             }
-            public IResult AddRange(IReadOnlyList<string> dates)
+            public void AddRange(IReadOnlyList<string> dates)
             {
                 foreach (string date in dates)
                 {
@@ -139,16 +137,13 @@ namespace Logic.Patients
 
                     this.Periods.Add(period);
                 }
-
-                return Result.Ok;
             }
 
             public async Task<IResult> Go()
             {
                 try
                 {
-                    if (this.Verify() == false)
-                        return Result.BadRequest;
+                    this.Verify();
 
                     IResult result = await this.Process();
 
@@ -158,7 +153,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.BadRequest;
+                    return Result.New(exception);
                 }
             }
             #endregion
@@ -167,7 +162,7 @@ namespace Logic.Patients
             private bool Verify()
             {
                 if (this.Periods.Count == 0)
-                    return false;
+                    throw new ArgumentException("Date should be indicated.");
 
                 return true;
             }
@@ -184,7 +179,7 @@ namespace Logic.Patients
                 {
                     HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
                     if (humanName == null)
-                        return Result.BadRequest;
+                        return Result.NotFound;
 
                     PatientInfo info = PatientInfo.New(patient, humanName);
 

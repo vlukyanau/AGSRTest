@@ -133,7 +133,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.BadRequest;
+                    return Result.New(exception);
                 }
             }
             public async Task<IResult> Go(Guid id)
@@ -148,7 +148,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.BadRequest;
+                    return Result.New(exception);
                 }
             }
             #endregion
@@ -166,7 +166,7 @@ namespace Logic.Patients
                 {
                     HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
                     if (humanName == null)
-                        return Result.BadRequest;
+                        return Result.NotFound;
 
                     PatientInfo info = PatientInfo.New(patient, humanName);
 
@@ -185,7 +185,7 @@ namespace Logic.Patients
 
                 HumanName humanName = await loading.GetHumanName(patient.HumanNameId);
                 if (humanName == null)
-                    return Result.BadRequest;
+                    return Result.NotFound;
 
                 IPatientInfo info = PatientInfo.New(patient, humanName);
 

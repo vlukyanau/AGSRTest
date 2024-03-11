@@ -64,9 +64,7 @@ namespace Api.Controllers
         {
             Patients.Searching search = Patients.Searching.New();
 
-            IResult addResult = search.AddRange(date);
-            if (addResult == Result.BadRequest)
-                return new OutputResult(addResult);
+            search.AddRange(date);
 
             IResult result = await search.Go();
 

@@ -53,7 +53,7 @@ namespace Logic.Extensions
             }
 
             if (DateTime.TryParse(date, out DateTime result) == false)
-                throw new ArgumentException("Parametr DateTime not valid."); // TODO: EXEPTION NOT VALID
+                throw new ArgumentException("Parametr DateTime not valid.");
 
             switch (prefix)
             {
@@ -87,7 +87,7 @@ namespace Logic.Extensions
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(prefix));
+                    throw new ArgumentException(nameof(prefix));
             }
 
             return (from, till, prefix);

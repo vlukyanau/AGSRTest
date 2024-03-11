@@ -4,6 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
   <PropertyGroup>
     <NoWarn>IDE0063;IDE0090;CA1822</NoWarn>
   </PropertyGroup>

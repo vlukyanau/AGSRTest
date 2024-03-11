@@ -62,7 +62,7 @@ namespace Logic.Common
                 Prefix.sa => date > this.Till,
                 Prefix.eb => date < this.From,
                 Prefix.ap => date >= this.From.AddTicks(-this.GetApproximateTicks(this.From)) && date <= this.Till.AddTicks(this.GetApproximateTicks(date)),
-                _ => throw new ArgumentOutOfRangeException(nameof(this.Prefix)),
+                _ => throw new ArgumentException(nameof(this.Prefix)),
             };
         }
 

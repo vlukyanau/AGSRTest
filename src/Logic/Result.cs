@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 using Logic.Models;
@@ -29,7 +30,34 @@ namespace Logic
         }
         #endregion
 
+        #region Classes
+        private class MessageInfo
+        {
+            #region Static
+            public static MessageInfo New(string message)
+            {
+                MessageInfo info = new MessageInfo();
+                info.Message = message;
+
+                return info;
+            }
+            #endregion
+
+            #region Properties
+            public string Message { get; set; }
+            #endregion
+        }
+        #endregion
+
         #region Static
+        public static Result New(Exception exception)
+        {
+            Result result = new Result();
+            result.Data = MessageInfo.New(exception.Message);
+            result.Code = HttpStatusCode.BadRequest;
+
+            return result;
+        }
         public static Result New(HttpStatusCode code)
         {
             Result result = new Result();
@@ -58,7 +86,6 @@ namespace Logic
         public static readonly Result Ok = HttpStatusCode.OK;
         public static readonly Result Created = HttpStatusCode.Created;
         public static readonly Result NoContent = HttpStatusCode.NoContent;
-        public static readonly Result BadRequest = HttpStatusCode.BadRequest;
         public static readonly Result NotFound = HttpStatusCode.NotFound;
         #endregion
 

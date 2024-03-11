@@ -1,29 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Core;
 using Core.Entities;
-
-using Logic.Models;
 
 
 namespace Logic.Patients
 {
     public static partial class Patients
     {
-        public sealed class Creation
+        public sealed class Updating
         {
             #region Static
-            public static Creation New()
+            public static Updating New()
             {
-                return new Creation();
+                return new Updating();
             }
             #endregion
 
             #region Constructors
-            private Creation()
+            private Updating()
             {
                 this.worker = Worker.New();
             }
@@ -48,73 +46,67 @@ namespace Logic.Patients
             {
                 try
                 {
-                    if (this.Verify() == false)
-                        return Result.BadRequest;
+                    this.Verify();
 
                     IResult result = await this.Process();
 
                     return result;
-
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
 
-                    return Result.BadRequest;
+                    return Result.New(exception);
                 }
             }
             #endregion
 
             #region Assistants
-            private bool Verify()
+            private void Verify()
             {
-                if (this.Id != null)
-                    return false;
+                if (this.Id == null)
+                    throw new ArgumentNullException(nameof(this.Id));
 
                 if (string.IsNullOrWhiteSpace(this.Use) == true)
-                    return false;
+                    throw new ArgumentNullException(nameof(this.Use));
 
                 if (string.IsNullOrWhiteSpace(this.Family) == true)
-                    return false;
+                    throw new ArgumentNullException($"{nameof(this.Family)} cannot be null or whitespace");
 
-                if (this.Given.Count == 0)
-                    return false;
-
-                if (this.Given.Any(string.IsNullOrWhiteSpace) == true)
-                    return false;
+                if (this.Given != null && this.Given.Any(string.IsNullOrWhiteSpace) == true)
+                    throw new ArgumentNullException($"{nameof(this.Given)} cannot be null or whitespace");
 
                 if (this.Gender != null && Enum.IsDefined(typeof(Gender), this.Gender) == false)
-                    return false;
+                    throw new ArgumentNullException($"{nameof(this.Gender)} not valid");
 
                 if (this.BirthDate == null)
-                    return false;
-
-                if (this.BirthDate.Value.ToUniversalTime() > DateTime.UtcNow)
-                    return false;
-
-                return true;
+                    throw new ArgumentNullException(nameof(this.Use));
             }
 
             private async Task<IResult> Process()
             {
-                HumanName humanName = HumanName.New();
-                humanName.Use = this.Use;
-                humanName.Family = this.Family;
-                humanName.Given.AddRange(this.Given);
+                Patient patient = await this.worker.Patients.GetId((Guid)this.Id);
+                if (patient == null)
+                    return Result.NotFound;
 
-                Patient patient = Patient.New(humanName.Id);
+                HumanName humanName = await this.worker.HumanNames.GetId(patient.HumanNameId);
+                if (humanName == null)
+                    return Result.NotFound;
+
                 patient.Gender = this.Gender;
-                patient.BirthDate = this.BirthDate.Value.ToUniversalTime();
+                patient.BirthDate = (DateTime)this.BirthDate;
                 patient.Active = this.Active;
 
-                await this.worker.HumanNames.Add(humanName);
-                await this.worker.Patients.Add(patient);
+                humanName.Use = this.Use;
+                humanName.Family = this.Family;
+                humanName.Given = this.Given;
+
+                this.worker.HumanNames.Update(humanName);
+                this.worker.Patients.Update(patient);
 
                 this.worker.Save();
 
-                PatientInfo info = PatientInfo.New(patient, humanName);
-
-                return Result.New(info, Result.Created);
+                return Result.NoContent;
             }
             #endregion
         }

@@ -46,7 +46,7 @@ namespace Logic.Patients
                 {
                     Console.WriteLine(exception);
 
-                    return Result.BadRequest;
+                    return Result.New(exception);
                 }
             }
             #endregion
