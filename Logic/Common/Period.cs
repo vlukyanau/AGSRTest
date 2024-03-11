@@ -18,6 +18,10 @@ namespace Logic.Common
 
     internal sealed class Period
     {
+        #region Constants
+        private const double Approximate = 0.1; // 10%
+        #endregion
+
         #region Operators
         public static implicit operator Period((DateTime From, DateTime Till, Prefix prefix) period)
         {
@@ -55,10 +59,9 @@ namespace Logic.Common
                 Prefix.lt => date < this.Till,
                 Prefix.ge => date >= this.From,
                 Prefix.le => date <= this.Till,
-                // TODO: Implement
-                Prefix.sa => false,
-                Prefix.eb => false,
-                Prefix.ap => false,
+                Prefix.sa => date > this.Till,
+                Prefix.eb => date < this.From,
+                Prefix.ap => date >= this.From.AddTicks(-this.GetApproximateTicks(this.From)) && date <= this.Till.AddTicks(this.GetApproximateTicks(date)),
                 _ => throw new ArgumentOutOfRangeException(nameof(this.Prefix)),
             };
         }
@@ -70,5 +73,12 @@ namespace Logic.Common
             prefix = this.Prefix;
         }
         #endregion
+
+        private long GetApproximateTicks(DateTime date)
+        {
+            long ticks = DateTime.UtcNow.Ticks - date.Ticks;
+
+            return Convert.ToInt64(Math.Abs(ticks) * Period.Approximate);
+        }
     }
 }
