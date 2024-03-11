@@ -9,7 +9,7 @@
 			"name": "Search by birthdate",
 			"item": [
 				{
-					"name": "Valid (not prefix)",
+					"name": "not prefix",
 					"item": [
 						{
 							"name": "Create Patient",
@@ -514,7 +514,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{patch}}/patients/birthdate?date=2024-01-12T22:32:12.123456789+03:12",
+									"raw": "{{patch}}/patients/birthdate?date=2024-01-12T22:32:12.123456789%2B03:12",
 									"host": [
 										"{{patch}}"
 									],
@@ -525,7 +525,7 @@
 									"query": [
 										{
 											"key": "date",
-											"value": "2024-01-12T22:32:12.123456789+03:12"
+											"value": "2024-01-12T22:32:12.123456789%2B03:12"
 										}
 									]
 								}
@@ -571,7 +571,7 @@
 					]
 				},
 				{
-					"name": "Valid (with prefix)",
+					"name": "with prefix",
 					"item": [
 						{
 							"name": "Create Patient",
