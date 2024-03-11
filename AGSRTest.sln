@@ -14,7 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postman", "Postman", "{D13D
 		Postman\TestPatientApi.postman_collection.json = Postman\TestPatientApi.postman_collection.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{74D03955-E701-430D-8E56-2BCAF9684856}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{74D03955-E701-430D-8E56-2BCAF9684856}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3241DCC8-4954-43EB-939D-2E45DF1A5056}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4F6356D2-3ABF-48F5-8AA8-FAC5D05807D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{708E5A76-7A33-4ACD-B37B-410D7D005321} = {3241DCC8-4954-43EB-939D-2E45DF1A5056}
+		{09DB2EDC-DA47-484E-AC83-33F4ECA820E3} = {3241DCC8-4954-43EB-939D-2E45DF1A5056}
+		{12B05409-DF23-4329-A589-A0460E01986A} = {3241DCC8-4954-43EB-939D-2E45DF1A5056}
+		{D13D6E70-846A-4C16-A6E1-CDD52A586207} = {4F6356D2-3ABF-48F5-8AA8-FAC5D05807D6}
+		{74D03955-E701-430D-8E56-2BCAF9684856} = {3241DCC8-4954-43EB-939D-2E45DF1A5056}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {490113DA-6C8C-463D-8902-D4DFAC004460}
